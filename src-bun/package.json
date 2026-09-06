@@ -1,0 +1,19 @@
+{
+  "name": "src-bun",
+  "module": "src/main.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "bun build ./src/main.ts --compile --windows-hide-console --outfile ../src-tauri/binaries/stock-x86_64-pc-windows-msvc"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "tauri-plugin-tauribun": "^0.1.0",
+    "zod": "^4.5.4"
+  }
+}
