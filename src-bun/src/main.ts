@@ -15,4 +15,3 @@ const router = {
 // 启动服务器，'server' 是服务器标识符
 createServer('server', router)
 export type Router = typeof router
-console.log('服务器启动完成')

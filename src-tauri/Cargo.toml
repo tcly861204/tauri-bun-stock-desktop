@@ -23,7 +23,12 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = { version = "0.4", features = ["std"] }
-tauri-plugin-tauribun = "0.1.0"
+# Vendored so we can patch the sidecar spawn to use CREATE_NO_WINDOW
+# (prevents a black console window appearing next to the packaged GUI app).
+# See vendor/tauri-plugin-tauribun/README.md. To rebase on an upstream
+# release, diff against the crates.io source and re-apply the one change in
+# src/desktop.rs.
+tauri-plugin-tauribun = { path = "vendor/tauri-plugin-tauribun" }
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration

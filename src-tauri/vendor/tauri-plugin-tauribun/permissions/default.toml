@@ -1,0 +1,10 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "Default permissions for the tauribun plugin - allows spawning and managing Bun sidecars"
+permissions = [
+    "allow-ping",
+    "allow-spawn-server",
+    "allow-send-message",
+    "allow-kill-server"
+]

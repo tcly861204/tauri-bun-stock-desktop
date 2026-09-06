@@ -1,0 +1,28 @@
+[package]
+name = "tauri-plugin-tauribun"
+version = "0.1.0"
+authors = ["lott-ai"]
+description = "Tauri plugin for managing Bun sidecars with oRPC communication"
+homepage = "https://github.com/lott-ai/tauribun"
+keywords = ["tauri", "plugin", "bun", "orpc", "sidecar"]
+categories = ["development-tools", "gui"]
+exclude = ["**/*.ts", "/node_modules"]
+links = "tauri-plugin-tauribun"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+tauri.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+log.workspace = true
+
+[build-dependencies]
+tauri-plugin.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

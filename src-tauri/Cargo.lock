@@ -3546,8 +3546,6 @@ dependencies = [
 [[package]]
 name = "tauri-plugin-tauribun"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0d9cbf6a7163a1eb2012aa0a828549d49d85aea3460ff52d0efddbcf181d6cd"
 dependencies = [
  "log",
  "serde",
