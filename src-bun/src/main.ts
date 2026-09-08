@@ -1,17 +1,9 @@
 import { createServer } from 'tauri-plugin-tauribun'
-import { os } from '@orpc/server'
-import * as z from 'zod'
-
+import { getStockkline, getStockRealtime } from './stock'
 const router = {
-  greet: os
-    .input(z.object({ name: z.string() }))
-    .output(z.object({ greeting: z.string() }))
-    .handler(async ({ input }) => {
-      console.log(input)
-      return { greeting: `Hello from server, ${input.name}!` }
-    }),
+  getStockkline,
+  getStockRealtime,
 }
-
 // 启动服务器，'server' 是服务器标识符
 createServer('server', router)
 export type Router = typeof router

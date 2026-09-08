@@ -12,16 +12,29 @@
   "dependencies": {
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "animate.css": "^4.1.1",
+    "big.js": "^7.0.1",
+    "dayjs": "^1.11.23",
+    "jquery": "^4.0.0",
+    "lucide-react": "^1.41.0",
+    "nanoid": "^6.0.1",
+    "nprogress": "^0.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.18.3",
     "tauri-plugin-tauribun": "^0.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@tauri-apps/cli": "^2",
+    "@types/big.js": "^7.0.0",
+    "@types/jquery": "^4.0.1",
     "@types/node": "^26.4.1",
+    "@types/nprogress": "^0.2.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^6.0.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",
     "vite": "^8.0.16"
   }

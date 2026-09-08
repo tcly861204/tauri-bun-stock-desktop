@@ -6,6 +6,12 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "tauribun:default"
+    "tauribun:default",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-start-dragging"
   ]
 }

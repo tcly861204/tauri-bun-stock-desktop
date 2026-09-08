@@ -13,8 +13,11 @@
     "windows": [
       {
         "title": "tauri-bun-stock-desktop",
-        "width": 800,
-        "height": 600
+        "width": 1920,
+        "height": 1080,
+        "decorations": false,
+        "center": true,
+        "maximized": true
       }
     ],
     "security": {
@@ -31,8 +34,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "binaries/stock"
-    ]
+    "externalBin": ["binaries/stock"]
   }
 }
