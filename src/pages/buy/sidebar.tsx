@@ -59,7 +59,7 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
       .finally(() => setLoading(false))
   }, [tab, panel])
   return (
-    <section className='w-[240px] h-[calc(100vh-200px)] relative flex flex-col pr-1'>
+    <section className='w-[240px] h-[calc(100vh-226px)] relative flex flex-col pr-1'>
       <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
         {sideList.map((item, index) => (
           <StockItem

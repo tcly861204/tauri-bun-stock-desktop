@@ -50,7 +50,7 @@ const StockItem: FC<Props> = ({ item, active, index, onClick }) => {
         </p>
       )}
       <div
-        className={`absolute top-0 left-0 w-[4px] bottom-0 z-[10] ${active ? '' : (item?.profit || 0) < 0 ? 'bg-green-400' : (item?.profit || 0) > 9.5 ? 'bg-fuchsia-500' : ''}`}
+        className={`absolute top-0 left-0 w-[3px] bottom-0 z-[10] ${active ? '' : (item?.profit || 0) < 0 ? 'bg-green-400' : (item?.profit || 0) > 9.5 ? 'bg-fuchsia-500' : ''}`}
       />
     </div>
   )

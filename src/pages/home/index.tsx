@@ -1,29 +1,9 @@
 import { useEffect, useState } from 'react'
 import { queryApi } from '@/libs/api'
+import { FundCard } from './fund-item'
 import { client } from '@/libs/orpc'
 import { round } from '@/libs/math'
-
-interface DBFund {
-  type: number
-  code: string
-  name: string
-  byCostPrice: number
-  byDate: string
-  byNum: number
-  etf_code: string
-  etf_name: string
-  etf_type: number
-  theme_code: string
-  theme_name: string
-}
-
-interface ExtFund {
-  curPrice: string
-  change: number
-  curDate: string
-}
-
-type FundItem = DBFund & ExtFund
+import { DBFund, ExtFund, FundItem } from './types'
 
 /** 解析腾讯行情接口返回的批量实时文本为 code → 行情 */
 const parseRealtimeQuotes = (text: string): Map<string, ExtFund> => {
@@ -44,10 +24,12 @@ const parseRealtimeQuotes = (text: string): Map<string, ExtFund> => {
     })
   return map
 }
-
+const stockCodeOf = (item: DBFund) => (item.etf_code ? `${item.type}-${item.etf_code}` : '')
 const Home = () => {
   const [loading, setLoading] = useState(false)
+  const [editingItem, setEditingItem] = useState<DBFund | null>(null)
   const [fundList, setFundList] = useState<FundItem[]>([])
+  const [selectCode, setSelectCode] = useState('')
   useEffect(() => {
     setLoading(true)
     queryApi<DBFund>(
@@ -70,6 +52,26 @@ const Home = () => {
         setLoading(false)
       })
   }, [])
-  return <section className='pt-5 pl-5 w-full relative min-h-[400px]'></section>
+  const handleDelete = (item: DBFund) => {
+    console.log(item)
+  }
+  return (
+    <section className='pt-5 pl-5 w-full relative min-h-[400px]'>
+      <section className='w-[300px] h-[calc(100vh-140px)] flex flex-col'>
+        <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
+          {fundList.map((item) => (
+            <FundCard
+              key={item.code}
+              item={item}
+              selected={selectCode === stockCodeOf(item)}
+              onSelect={() => setSelectCode(stockCodeOf(item))}
+              onEdit={() => setEditingItem(item)}
+              onDelete={() => handleDelete(item)}
+            />
+          ))}
+        </section>
+      </section>
+    </section>
+  )
 }
 export default Home
