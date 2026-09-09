@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-bun-stock-desktop",
+        "title": "理财宝",
         "width": 1920,
         "height": 1080,
         "decorations": false,

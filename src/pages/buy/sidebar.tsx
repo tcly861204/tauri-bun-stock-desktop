@@ -15,6 +15,7 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
   const [sideList, setSideList] = useState<SidebarItem[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
+    if (!tab) return
     setLoading(true)
     queryApi<SidebarItem>(
       `SELECT b.*, s.type, s.sub_sector_name as subSectorName, s."lowDay" FROM ${panel} as b LEFT JOIN sector_stocks as s ON b.code = s.code WHERE b."date" = '${tab}' AND s.is_hidden = 0 AND s.is_etf = 0`
