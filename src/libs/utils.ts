@@ -91,3 +91,7 @@ export function dayToWeekKline(
   }
   return Array.from(weeks.values())
 }
+
+export const mergeStockCodes = (list: { type: number; code: string }[]): string[] => {
+  return list.map((item) => `${item.type === 1 ? 'sh' : item.type === 0 ? 'sz' : 'bj'}${item.code}`)
+}

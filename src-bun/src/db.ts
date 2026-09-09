@@ -1,11 +1,11 @@
 import { os } from '@orpc/server'
 import * as z from 'zod'
 import { Database } from 'bun:sqlite'
-const DB_PATH = 'D:\\soft\\stock-app-local-data\\database\\stock.db'
+import { CONFIG } from './const'
 let _db: Database | null = null
 function getDb(): Database {
   if (!_db) {
-    _db = new Database(DB_PATH)
+    _db = new Database(CONFIG.DATA_BASE_FILE)
     _db.run('PRAGMA journal_mode=WAL')
     _db.run('PRAGMA busy_timeout=5000')
   }

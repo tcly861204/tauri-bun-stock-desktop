@@ -3,16 +3,16 @@ import { useEffect, useState } from 'react'
 const Header = ({ tab, setTab }: { tab: string; setTab: (tab: string) => void }) => {
   const [tabList, setTabList] = useState<string[]>([])
   useEffect(() => {
-    queryApi('SELECT date FROM stock_tops GROUP BY "date" ORDER BY "date" DESC LIMIT 30').then(
-      (res) => {
-        const list = res.map((item) => item.date)
-        setTabList(list)
-        setTab(list[0])
-      }
-    )
+    queryApi<{ date: string }>(
+      `SELECT date FROM stock_tops GROUP BY "date" ORDER BY "date" DESC LIMIT 30`
+    ).then((res) => {
+      const list = res.map((item: { date: string }) => item.date)
+      setTabList(list)
+      setTab(list[0])
+    })
   }, [])
   return (
-    <section className='flex mb-2 gap-1 list-none min-h-[28px]'>
+    <section className='flex mb-4 gap-1 list-none min-h-[28px]'>
       {tabList.map((item) => {
         return (
           <li

@@ -1,20 +1,23 @@
 import { FC, useEffect, useState } from 'react'
-import { mergeStockCodes } from '@/libs/utils'
-import { queryApi, queryStockRealtime } from '@/libs/api'
 import StockItem from '@/components/stock-item'
 import type { SidebarItem } from '@/components/stock-item'
-interface Props {
+import { queryApi, queryStockRealtime } from '@/libs/api'
+import { mergeStockCodes } from '@/libs/utils'
+
+type Props = {
+  panel: string
   tab: string
   selectCode: string
   setSelectCode: (code: string) => void
 }
-const Sidebar: FC<Props> = ({ tab, selectCode, setSelectCode }) => {
+
+const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
   const [sideList, setSideList] = useState<SidebarItem[]>([])
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     setLoading(true)
     queryApi<SidebarItem>(
-      `SELECT t.*, s."lowDay" FROM stock_tops as t LEFT JOIN sector_stocks as s ON t.code = s.code WHERE t."date" = '${tab}' AND s.is_hidden = 0`
+      `SELECT b.*, s.type, s.sub_sector_name as subSectorName, s."lowDay" FROM ${panel} as b LEFT JOIN sector_stocks as s ON b.code = s.code WHERE b."date" = '${tab}' AND s.is_hidden = 0 AND s.is_etf = 0`
     )
       .then(async (res) => {
         const codes = mergeStockCodes(res as { type: number; code: string }[])
@@ -52,10 +55,8 @@ const Sidebar: FC<Props> = ({ tab, selectCode, setSelectCode }) => {
             .sort((a, b) => b.profit - a.profit)
         )
       })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [tab])
+      .finally(() => setLoading(false))
+  }, [tab, panel])
   return (
     <section className='w-[240px] h-[calc(100vh-200px)] relative flex flex-col pr-1'>
       <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
@@ -72,5 +73,4 @@ const Sidebar: FC<Props> = ({ tab, selectCode, setSelectCode }) => {
     </section>
   )
 }
-
 export default Sidebar

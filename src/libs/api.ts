@@ -1,7 +1,8 @@
 import { client } from './orpc'
 import $ from 'jquery'
-export const queryApi = async (sql: string) => {
-  return await client.orpc.Query({ sql })
+import { isLongShadow } from '@/libs/utils'
+export const queryApi = async <T>(sql: string) => {
+  return (await client.orpc.Query({ sql })) as T[]
 }
 export const execApi = async (sql: string) => {
   return await client.orpc.Execute({ sql })
@@ -12,6 +13,47 @@ export const queryDayKline = async (code: string) => {
 export const queryWeekKline = async (code: string) => {
   return await client.orpc.getStockkline({ code, type: 'week' }).then((res) => JSON.parse(res))
 }
+export const queryStockRealtime = async (
+  code: string | string[],
+  cb?: (info: {
+    code: string
+    name: string
+    profit: number
+    market_cap: number
+    price: number
+    isYLine: boolean
+    isLongShadow: boolean
+  }) => void
+) => {
+  if (Array.isArray(code)) {
+    code = code.join(',')
+  }
+  const stocks = await client.orpc.getStockRealtime({ code })
+  const list = stocks
+    .split('\n')
+    .filter((item: string) => item && item.length > 10)
+    .map((item: string) => {
+      const fields = item.split('~')
+      const info = {
+        code: fields[2],
+        name: fields[1],
+        profit: Number(fields[32]), // 涨跌幅
+        market_cap: Number(fields[39]), // 市值
+        price: Number(fields[3]), // 最新价
+        isYLine: parseFloat(fields[3]) > parseFloat(fields[5]), // 是否收阳
+        isLongShadow: isLongShadow(
+          parseFloat(fields[5]),
+          parseFloat(fields[3]),
+          parseFloat(fields[41]),
+          parseFloat(fields[42])
+        ), // 是否长影
+      }
+      cb?.(info)
+      return info
+    })
+  return list
+}
+
 export const getTopIndex = async () => {
   const codes = [
     'sh000001', // 上证指数
@@ -26,8 +68,8 @@ export const getTopIndex = async () => {
   const stocks = await client.orpc.getStockRealtime({ code: codes.join(',') })
   const list = stocks
     .split('\n')
-    .filter((item) => item && item.length > 10)
-    .map((item) => {
+    .filter((item: string) => item && item.length > 10)
+    .map((item: string) => {
       const stock = item.split('~')
       return {
         full: stock[0].split('=')[0].slice(2).slice(0, 2) + '#' + stock[2],
