@@ -1,6 +1,11 @@
 import { client } from './orpc'
 import $ from 'jquery'
-
+export const queryApi = async (sql: string) => {
+  return await client.orpc.Query({ sql })
+}
+export const execApi = async (sql: string) => {
+  return await client.orpc.Execute({ sql })
+}
 export const queryDayKline = async (code: string) => {
   return await client.orpc.getStockkline({ code, type: 'day' }).then((res) => JSON.parse(res))
 }
