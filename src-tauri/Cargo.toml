@@ -31,6 +31,7 @@ log = { version = "0.4", features = ["std"] }
 # release, diff against the crates.io source and re-apply the one change in
 # src/desktop.rs.
 tauri-plugin-tauribun = { path = "vendor/tauri-plugin-tauribun" }
+tauri-plugin-single-instance = "2.4.4"
 
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
