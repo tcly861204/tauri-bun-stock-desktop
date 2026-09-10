@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { add, divide, subtract } from './math'
+import type { SidebarItem } from '@/components/stock-item'
 
 export const formatDate = (fmt: string = 'YYYY-MM-DD HH:mm:ss', date?: dayjs.ConfigType) => {
   return dayjs(date).format(fmt)
@@ -95,3 +96,11 @@ export function dayToWeekKline(
 export const mergeStockCodes = (list: { type: number; code: string }[]): string[] => {
   return list.map((item) => `${item.type === 1 ? 'sh' : item.type === 0 ? 'sz' : 'bj'}${item.code}`)
 }
+
+export const isValidStock = (item: SidebarItem) =>
+  !(
+    item.name.includes('退') ||
+    item.name.includes('停') ||
+    item.name.includes('st') ||
+    item.name.includes('ST')
+  )

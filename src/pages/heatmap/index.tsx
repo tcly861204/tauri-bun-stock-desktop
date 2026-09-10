@@ -5,6 +5,7 @@ import { round } from '@/libs/math'
 import LoadingSkeleton from '@/components/loading/skeleton'
 import SubTitle from './subTitle'
 import SubGroup from './subGroup'
+import { Search } from 'lucide-react'
 
 /* ─── types ─── */
 interface StockData {
@@ -200,7 +201,7 @@ export default function Heatmap() {
     <section className="w-full h-[calc(100vh-40px)] overflow-auto overflow-x-hidden scrollbar flex flex-col select-none font-['Outfit',sans-serif]">
       {/* ── header ── */}
       <div className='shrink-0 px-6 pt-5 pb-2 flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
+        <div className='flex items-end gap-3'>
           <h1 className='text-base font-bold text-white/90'>🔥 情绪热力图</h1>
           <span className="text-[11px] text-gray-600 font-['JetBrains_Mono',monospace]">{ts}</span>
         </div>
@@ -245,7 +246,9 @@ export default function Heatmap() {
       {/* ── toolbar ── */}
       <div className='shrink-0 px-6 pb-3 flex items-center gap-3'>
         <div className='relative flex-1 max-w-xs'>
-          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs'>🔍</span>
+          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs'>
+            <Search size={14} />
+          </span>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}

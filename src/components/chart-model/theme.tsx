@@ -45,7 +45,6 @@ export function ThemePanel({
         })
         setSideList(
           Object.values(stocks)
-            .filter((item) => item.isYLine || item.isLongShadow)
             .filter(
               (item) =>
                 !(
@@ -55,7 +54,6 @@ export function ThemePanel({
                   item.name.includes('ST')
                 )
             )
-            .filter((item) => item.market_cap > 0 && item.market_cap < 120)
             .sort((a, b) => b.profit - a.profit)
         )
       })

@@ -6,7 +6,13 @@ interface DrawOptions {
   riskPulse: number
 }
 
-export function drawNuclearWarning({ ctx, padding, chartWidth, chartHeight, riskPulse }: DrawOptions) {
+export function drawNuclearWarning({
+  ctx,
+  padding,
+  chartWidth,
+  chartHeight,
+  riskPulse,
+}: DrawOptions) {
   const cx = padding.left + chartWidth / 2
   const cy = padding.top + chartHeight / 2
   const p = riskPulse
@@ -15,11 +21,13 @@ export function drawNuclearWarning({ ctx, padding, chartWidth, chartHeight, risk
 
   // 1. 暗角 vignette
   const vigR = Math.max(chartWidth, chartHeight) * 0.7
-  const vig = ctx.createRadialGradient(cx, cy, 0, cx, cy, vigR)
-  vig.addColorStop(0, 'rgba(0,0,0,0)')
-  vig.addColorStop(1, `rgba(40,0,0,${0.12 * p})`)
-  ctx.fillStyle = vig
-  ctx.fillRect(padding.left, padding.top, chartWidth, chartHeight)
+  if (vigR > 0) {
+    const vig = ctx.createRadialGradient(cx, cy, 0, cx, cy, vigR)
+    vig.addColorStop(0, 'rgba(0,0,0,0)')
+    vig.addColorStop(1, `rgba(40,0,0,${0.12 * p})`)
+    ctx.fillStyle = vig
+    ctx.fillRect(padding.left, padding.top, chartWidth, chartHeight)
+  }
 
   // 2. 外层大气辉光
   const atm = ctx.createRadialGradient(cx, cy, 10, cx, cy, 140)
