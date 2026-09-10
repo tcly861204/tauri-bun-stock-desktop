@@ -11,7 +11,7 @@ program
   .version('1.0.0')
   .action(async () => {
     const choices = [
-      { name: '⬇️  Download stock data', value: 'download' },
+      { name: '⬇️ Download stock data', value: 'download' },
       { name: '🔄 Update kline data from real-time quote', value: 'update' },
       { name: '📈 Top 涨幅榜', value: 'king' },
     ]
