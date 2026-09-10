@@ -13,6 +13,11 @@ export const queryDayKline = async (code: string) => {
 export const queryWeekKline = async (code: string) => {
   return await client.orpc.getStockkline({ code, type: 'week' }).then((res) => JSON.parse(res))
 }
+
+export const getHeatmapData = async () => {
+  return await client.orpc.getHeatmapData()
+}
+
 export const queryStockRealtime = async (
   code: string | string[],
   cb?: (info: {

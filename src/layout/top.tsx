@@ -37,6 +37,7 @@ const Top = () => {
             className='flex text-gray-400 cursor-pointer hover:text-gray-200 transition-colors duration-200'
             key={item.code}
             onClick={() => handleStockClick(item.full, false)}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             <dd className="px-[10px] text-sm flex items-center font-['JetBrains_Mono',monospace] tracking-[-0.01em]">
               <span className={`mr-1 ${item.change > 0 ? 'text-[#ff4757]' : 'text-[#2ed573]'}`}>

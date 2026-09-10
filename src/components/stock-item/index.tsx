@@ -20,7 +20,7 @@ const StockItem: FC<Props> = ({ item, active, index, onClick }) => {
   const market_cap = item.market_cap
   return (
     <div
-      className={`relative overflow-hidden h-[60px] min-h-[60px] flex text-[12px] flex-col gap-0 rounded-md box-border px-3 py-2 cursor-pointer ${active ? 'bg-emerald-500 text-white' : 'bg-[#1e2025] text-gray-500'}`}
+      className={`relative select-none overflow-hidden h-[60px] min-h-[60px] flex text-[12px] flex-col gap-0 rounded-md box-border px-3 py-2 cursor-pointer ${active ? 'bg-emerald-500 text-white' : 'bg-[#1e2025] text-gray-500'}`}
       onClick={() => onClick(`${item.type}-${item.code}`)}
     >
       <p className='m-0 p-0 outline-none mb-2 flex'>

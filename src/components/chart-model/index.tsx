@@ -31,7 +31,7 @@ const StockChartModel: React.FC<Props> = ({
       style={{ width: screen.width, height: screen.height }}
       onClick={(event) => event.target === event.currentTarget && handleClose()}
     >
-      <section className='w-[calc(100vw-50px)] h-[calc(100vh-124px)] flex gap-2 bg-black rounded-md p-2'>
+      <section className='w-[calc(100vw-80px)] h-[822px] flex gap-2 bg-black rounded-md p-2'>
         {isTheme ? (
           <ThemePanel
             themeCode={themeCode}

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { queryApi, queryStockRealtime } from '@/libs/api'
 import StockItem from '@/components/stock-item'
 import type { SidebarItem } from '@/components/stock-item'
-import Loading from '@/components/loading'
+import Skeleton from '@/components/skeleton'
 import { round } from '@/libs/math'
 import { mergeStockCodes } from '@/libs/utils'
 export function ThemePanel({
@@ -21,7 +21,7 @@ export function ThemePanel({
   useEffect(() => {
     setLoading(true)
     queryApi(
-      `SELECT type, code, name, lowDay, profit, market_cap, is_hidden as hidden FROM sector_stocks WHERE is_etf = 0 AND (sector_code = '${themeCode}' OR sub_sector_name = '${themeCode}')`
+      `SELECT type, code, name, lowDay, profit, market_cap, is_hidden as hidden FROM sector_stocks WHERE is_etf = 0 AND is_hidden = 0 AND (sector_code = '${themeCode}' OR sub_sector_name = '${themeCode}')`
     )
       .then(async (res) => {
         const codes = mergeStockCodes(res as { type: number; code: string }[])
@@ -93,7 +93,7 @@ export function ThemePanel({
     return avg
   }, [sideList])
   return (
-    <section className='w-[280px] max-w-[280px] min-w-[280px] h-[calc(100vh-138px)] flex flex-col'>
+    <section className='w-[240px] max-w-[240px] min-w-[240px] h-[806px] flex flex-col'>
       <section
         className={`flex-shrink-0 text-[13px] mb-2 h-[36px] leading-[36px] text-white rounded-md text-center ${extInfo?.avgChange > 0 ? 'bg-[#f00]' : 'bg-emerald-500 '}`}
       >
@@ -107,8 +107,9 @@ export function ThemePanel({
         tabIndex={-1}
         onKeyDown={handleKeyDown}
       >
-        {loading && <Loading />}
-        {!loading &&
+        {loading ? (
+          <Skeleton />
+        ) : (
           sideList.map((item, index) => (
             <StockItem
               key={item.code}
@@ -117,7 +118,8 @@ export function ThemePanel({
               index={index}
               onClick={setSelectCode}
             />
-          ))}
+          ))
+        )}
       </section>
     </section>
   )

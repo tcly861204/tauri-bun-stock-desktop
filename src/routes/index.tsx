@@ -7,6 +7,8 @@ const Collection = lazy(() => import('@/pages/collection'))
 const Globe = lazy(() => import('@/pages/globe'))
 const King = lazy(() => import('@/pages/king'))
 const Scan = lazy(() => import('@/pages/scan'))
+const Heatmap = lazy(() => import('@/pages/heatmap'))
+const View = lazy(() => import('@/pages/view'))
 const Setting = lazy(() => import('@/pages/setting'))
 const routes: RouteObject[] = [
   {
@@ -21,6 +23,11 @@ const routes: RouteObject[] = [
         path: '/buy',
         element: <Buy />,
       },
+      {
+        path: '/heatmap',
+        element: <Heatmap />,
+      },
+
       {
         path: '/collection',
         element: <Collection />,
@@ -42,6 +49,10 @@ const routes: RouteObject[] = [
         element: <Setting />,
       },
     ],
+  },
+  {
+    path: '/view',
+    element: <View />,
   },
 ]
 

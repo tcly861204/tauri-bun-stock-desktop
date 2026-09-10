@@ -1,4 +1,4 @@
-import { Home, Crown, ShoppingCartIcon, Sparkles, Globe, Settings } from 'lucide-react'
+import { Home, Crown, ShoppingCartIcon, Sparkles, Globe, Settings, RadioTower } from 'lucide-react'
 import { nanoid } from 'nanoid' // 引入nanoid库
 import { useLocation, useNavigate } from 'react-router-dom'
 const Menu = [
@@ -8,6 +8,7 @@ const Menu = [
   { id: nanoid(), label: '首页', icon: Home, path: '/' },
   { id: nanoid(), label: '收藏', icon: Sparkles, path: '/collection' },
   { id: nanoid(), label: '全球', icon: Globe, path: '/globe' },
+  { id: nanoid(), label: '热力', icon: RadioTower, path: '/heatmap' },
   { id: nanoid(), label: '设置', icon: Settings, path: '/setting' },
 ]
 const Sidebar = () => {

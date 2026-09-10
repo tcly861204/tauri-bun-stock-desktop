@@ -3,6 +3,7 @@ import { queryApi } from '@/libs/api'
 import { FundCard } from './fund-item'
 import { client } from '@/libs/orpc'
 import { round } from '@/libs/math'
+import Stock from '@/components/stock'
 import { DBFund, ExtFund, FundItem } from './types'
 
 /** 解析腾讯行情接口返回的批量实时文本为 code → 行情 */
@@ -57,8 +58,8 @@ const Home = () => {
   }
   return (
     <section className='pt-5 pl-5 w-full relative min-h-[400px]'>
-      <section className='w-[300px] h-[calc(100vh-140px)] flex flex-col'>
-        <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
+      <section className='flex pr-4 gap-2'>
+        <section className='w-[300px] h-[calc(100vh-140px)] flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
           {fundList.map((item) => (
             <FundCard
               key={item.code}
@@ -69,6 +70,9 @@ const Home = () => {
               onDelete={() => handleDelete(item)}
             />
           ))}
+        </section>
+        <section className='flex-1'>
+          <Stock code={selectCode} />
         </section>
       </section>
     </section>

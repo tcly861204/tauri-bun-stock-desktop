@@ -1,0 +1,75 @@
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.4; }
+}
+
+.container {
+  animation: pulse 1.6s ease-in-out infinite;
+  padding: 0 24px 24px;
+}
+
+.statBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0 12px;
+  flex-wrap: wrap;
+}
+
+.statPill {
+  height: 22px;
+  width: 72px;
+  border-radius: 8px;
+  background: #1e222d;
+}
+
+.searchBar {
+  height: 32px;
+  max-width: 320px;
+  border-radius: 8px;
+  background: #1e222d;
+  margin-bottom: 16px;
+}
+
+.group {
+  background: #141822;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.groupTitle {
+  height: 14px;
+  width: 80px;
+  border-radius: 4px;
+  background: #1e222d;
+}
+
+.groupMeta {
+  height: 14px;
+  width: 48px;
+  border-radius: 4px;
+  background: #1e222d;
+}
+
+.cellGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 3px;
+  padding: 0 16px 14px;
+}
+
+.cell {
+  height: 44px;
+  border-radius: 6px;
+  background: #1e222d;
+}

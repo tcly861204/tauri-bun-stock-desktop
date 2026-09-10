@@ -15,11 +15,13 @@ export function drawBuySignal({ ctx, padding, chartWidth, chartHeight, pulse }: 
 
   // 1. 暗角 (green tint)
   const vigR = Math.max(chartWidth, chartHeight) * 0.7
-  const vig = ctx.createRadialGradient(cx, cy, 0, cx, cy, vigR)
-  vig.addColorStop(0, 'rgba(0,0,0,0)')
-  vig.addColorStop(1, `rgba(0,30,0,${0.1 * p})`)
-  ctx.fillStyle = vig
-  ctx.fillRect(padding.left, padding.top, chartWidth, chartHeight)
+  if (vigR > 0) {
+    const vig = ctx.createRadialGradient(cx, cy, 0, cx, cy, vigR)
+    vig.addColorStop(0, 'rgba(0,0,0,0)')
+    vig.addColorStop(1, `rgba(0,30,0,${0.1 * p})`)
+    ctx.fillStyle = vig
+    ctx.fillRect(padding.left, padding.top, chartWidth, chartHeight)
+  }
 
   // 2. 外发光 (green/gold)
   const atm = ctx.createRadialGradient(cx, cy, 10, cx, cy, 130)

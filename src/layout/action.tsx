@@ -1,8 +1,10 @@
-import { Minus, Minimize, Maximize, X } from 'lucide-react'
+import { Minus, Minimize, Maximize, X, Eye } from 'lucide-react'
 import { useState, useLayoutEffect } from 'react'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useNavigate } from 'react-router-dom'
 
 const Action = () => {
+  const navigate = useNavigate()
   const [isMaximi, setIsMaximi] = useState<boolean>(false)
   const appWindow = getCurrentWindow()
   useLayoutEffect(() => {
@@ -18,6 +20,11 @@ const Action = () => {
   const close = () => appWindow.hide()
   return (
     <div className='flex gap-3 h-[40px] items-center' onMouseDown={(e) => e.stopPropagation()}>
+      <Eye
+        className='cursor-pointer text-[#666] hover:text-[#aaa]'
+        size={18}
+        onClick={() => navigate('/view')}
+      />
       <Minus
         className='cursor-pointer text-[#666] hover:text-[#aaa]'
         size={16}
@@ -36,7 +43,6 @@ const Action = () => {
           onClick={toggleMaximize}
         />
       )}
-
       <X size={16} className='cursor-pointer text-[#666] hover:text-[#aaa]' onClick={close} />
     </div>
   )
