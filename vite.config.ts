@@ -29,4 +29,17 @@ export default defineConfig(() => ({
       ignored: ['**/src-tauri/**'],
     },
   },
+  build: {
+    emptyOutDir: true,
+    cssCodeSplit: true,
+    sourcemap: false,
+    chunkSizeWarningLimit: 3000,
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[hash].js',
+        chunkFileNames: 'assets/[hash].js',
+        assetFileNames: 'assets/[hash].[ext]',
+      },
+    },
+  },
 }))
