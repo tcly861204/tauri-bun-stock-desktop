@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ChartPanel from '../stock/index'
+import { ThemePanel } from './theme'
 interface Props {
   code: string
   isTheme?: boolean
@@ -31,6 +32,14 @@ const StockChartModel: React.FC<Props> = ({
       onClick={(event) => event.target === event.currentTarget && handleClose()}
     >
       <section className='w-[calc(100vw-50px)] h-[calc(100vh-124px)] flex gap-2 bg-black rounded-md p-2'>
+        {isTheme ? (
+          <ThemePanel
+            themeCode={themeCode}
+            selectCode={activeCode}
+            setSelectCode={setActiveCode}
+            extInfo={extInfo}
+          />
+        ) : null}
         <ChartPanel code={activeCode} isETF={isETF} />
       </section>
     </section>

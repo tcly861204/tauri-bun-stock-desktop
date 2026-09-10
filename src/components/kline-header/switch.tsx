@@ -7,7 +7,9 @@ const Switch = ({ code }: { code: string | null }) => {
   const [active, setActive] = useState<boolean>(false)
   useEffect(() => {
     if (code) {
-      queryApi(`SELECT is_collection FROM sector_stocks WHERE code = '${code}'`).then((res) => {
+      queryApi<{ is_collection: number }>(
+        `SELECT is_collection FROM sector_stocks WHERE code = '${code}'`
+      ).then((res) => {
         setActive((res?.[0]?.is_collection || 0) === 1)
       })
     }

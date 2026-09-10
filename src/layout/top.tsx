@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { getTopIndex } from '@/libs/api'
 import { isWorking, isTrending, toNum } from '@/libs/utils'
 import logoImg from '@/assets/logo.png'
+import { useCreateStockModel } from '@/hooks/useCreateStockModel'
 import Action from './action'
 const Top = () => {
+  const { handleStockClick } = useCreateStockModel()
   const [list, setList] = useState<any[]>([])
   const appWindow = getCurrentWindow()
   const startDrag = () => {
@@ -34,6 +36,7 @@ const Top = () => {
           <dl
             className='flex text-gray-400 cursor-pointer hover:text-gray-200 transition-colors duration-200'
             key={item.code}
+            onClick={() => handleStockClick(item.full, false)}
           >
             <dd className="px-[10px] text-sm flex items-center font-['JetBrains_Mono',monospace] tracking-[-0.01em]">
               <span className={`mr-1 ${item.change > 0 ? 'text-[#ff4757]' : 'text-[#2ed573]'}`}>

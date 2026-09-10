@@ -1,5 +1,6 @@
 import { os } from '@orpc/server'
 import * as z from 'zod'
+// @ts-ignore bun 运行时模块：前端的 tsconfig 解析不到它，但 main.ts 的 Router 类型会经由本文件传递过去
 import { Database } from 'bun:sqlite'
 import { CONFIG } from './const'
 let _db: Database | null = null

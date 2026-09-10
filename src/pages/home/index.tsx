@@ -26,8 +26,8 @@ const parseRealtimeQuotes = (text: string): Map<string, ExtFund> => {
 }
 const stockCodeOf = (item: DBFund) => (item.etf_code ? `${item.type}-${item.etf_code}` : '')
 const Home = () => {
-  const [loading, setLoading] = useState(false)
-  const [editingItem, setEditingItem] = useState<DBFund | null>(null)
+  const [, setLoading] = useState(false)
+  const [, setEditingItem] = useState<DBFund | null>(null)
   const [fundList, setFundList] = useState<FundItem[]>([])
   const [selectCode, setSelectCode] = useState('')
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react'
+import Skeleton from '@/components/skeleton'
 import StockItem from '@/components/stock-item'
 import type { SidebarItem } from '@/components/stock-item'
 import { queryApi, queryStockRealtime } from '@/libs/api'
@@ -61,15 +62,19 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
   return (
     <section className='w-[240px] h-[calc(100vh-226px)] relative flex flex-col pr-1'>
       <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
-        {sideList.map((item, index) => (
-          <StockItem
-            key={item.code}
-            item={item}
-            index={index + 1}
-            active={`${item.type}-${item.code}` === selectCode}
-            onClick={setSelectCode}
-          />
-        ))}
+        {loading ? (
+          <Skeleton />
+        ) : (
+          sideList.map((item, index) => (
+            <StockItem
+              key={item.code}
+              item={item}
+              index={index + 1}
+              active={`${item.type}-${item.code}` === selectCode}
+              onClick={setSelectCode}
+            />
+          ))
+        )}
       </section>
     </section>
   )
