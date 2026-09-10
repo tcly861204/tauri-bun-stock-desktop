@@ -1,6 +1,8 @@
 import { FundItem } from './types'
 import { multiply, divide, subtract, round } from '@/libs/math'
 import { Trash, SquarePen } from 'lucide-react'
+import { useMemo } from 'react'
+import dayjs from 'dayjs'
 
 interface FundCardProps {
   item: FundItem
@@ -24,30 +26,21 @@ const calcProfit = (item: FundItem) => {
 export const FundCard = ({ item, selected, onSelect, onEdit, onDelete }: FundCardProps) => {
   const { profit, yieldRate } = calcProfit(item)
   const isUp = item.change >= 0
-  const canSell = item.byDate
-    ? (new Date().getTime() - new Date(item.byDate).getTime()) / 86400000 >= 7
-    : false
-
+  const canSell = useMemo(() => {
+    return item.byDate ? dayjs().diff(dayjs(item.byDate), 'day') >= 7 : false
+  }, [item.byDate])
   return (
     <section
-      className={`group relative rounded-lg px-3 py-2.5 border cursor-pointer transition-all duration-200 ${
-        selected
-          ? 'bg-gradient-to-b from-amber-400/[0.08] via-[#212127] to-[#1b1b20] border-amber-400/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_28px_rgba(0,0,0,0.45)]'
-          : 'bg-gradient-to-b from-[#232329] to-[#1b1b20] border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] hover:border-amber-400/25 hover:from-[#26262d]'
-      }`}
       onClick={onSelect}
+      className={`relative h-[96px] min-h-[96px] box-border overflow-hidden rounded-md p-3 cursor-pointer ${selected ? 'bg-[#141618]' : 'bg-[#1e2025]'}`}
     >
-      {selected && (
-        <span className='absolute left-0 top-2 bottom-2 w-[3px] rounded-r bg-amber-400/80' />
-      )}
-
       {/* 名称行 */}
       <div className='flex items-center justify-between mb-1.5'>
-        <p className='text-zinc-400 text-xs font-medium truncate min-w-0 flex-1 flex'>
+        <p className='text-zinc-500 text-xs font-medium truncate min-w-0 flex-1 flex'>
           <span className='text-emerald-400'>{item.code}</span>·{item.name}
         </p>
         <div
-          className={`flex items-center gap-1 shrink-0 ml-1.5 transition-opacity ${
+          className={`flex items-center shrink-0 ml-1.5 transition-opacity ${
             selected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
           }`}
         >
@@ -57,9 +50,9 @@ export const FundCard = ({ item, selected, onSelect, onEdit, onDelete }: FundCar
               onEdit()
             }}
             title='编辑'
-            className='p-0.5 rounded text-zinc-500 hover:text-amber-400'
+            className='p-0.5 rounded cursor-pointer text-zinc-500 hover:text-amber-400'
           >
-            <SquarePen size={12} />
+            <SquarePen size={14} />
           </button>
           <button
             onClick={(e) => {
@@ -67,9 +60,9 @@ export const FundCard = ({ item, selected, onSelect, onEdit, onDelete }: FundCar
               onDelete()
             }}
             title='删除'
-            className='p-0.5 rounded text-zinc-500 hover:text-red-400'
+            className='p-0.5 rounded cursor-pointer text-zinc-500 hover:text-red-400'
           >
-            <Trash size={12} />
+            <Trash size={14} />
           </button>
         </div>
         {item.curPrice && (
@@ -83,25 +76,23 @@ export const FundCard = ({ item, selected, onSelect, onEdit, onDelete }: FundCar
           </span>
         )}
       </div>
-
       {/* 数据行 */}
-      <div className='grid grid-cols-3 gap-1 mb-1.5'>
-        <div>
-          <p className='text-zinc-500 text-[9px] leading-tight'>现价</p>
-          <p className={`text-xs tabular-nums ${isUp ? 'text-red-400' : 'text-emerald-400'}`}>
+      <div className='grid grid-cols-3 gap-1 mb-1.5 text-zinc-500 text-[9px] leading-tight'>
+        <dl>
+          <dt>现价</dt>
+          <dd className={`text-xs tabular-nums ${isUp ? 'text-red-400' : 'text-emerald-400'}`}>
             {item.curPrice || '--'}
-          </p>
-        </div>
-        <div>
-          <p className='text-zinc-500 text-[9px] leading-tight'>成本</p>
-          <p className='text-zinc-200 text-xs tabular-nums'>{item.byCostPrice}</p>
-        </div>
-        <div>
-          <p className='text-zinc-500 text-[9px] leading-tight'>持仓</p>
-          <p className='text-zinc-200 text-xs tabular-nums'>{item.byNum}</p>
-        </div>
+          </dd>
+        </dl>
+        <dl>
+          <dt>成本</dt>
+          <dd className='text-zinc-200 text-xs tabular-nums'>{item.byCostPrice}</dd>
+        </dl>
+        <dl>
+          <dt>持仓</dt>
+          <dd className='text-zinc-200 text-xs tabular-nums'>{item.byNum || '--'}</dd>
+        </dl>
       </div>
-
       {/* 盈亏行 */}
       <div className='flex items-center justify-between'>
         <span className='text-zinc-500 text-[9px]'>
@@ -125,6 +116,9 @@ export const FundCard = ({ item, selected, onSelect, onEdit, onDelete }: FundCar
           </span>
         </span>
       </div>
+      {selected ? (
+        <div className='bg-emerald-500 absolute left-0 top-0 bottom-0 w-[3px]'></div>
+      ) : null}
     </section>
   )
 }

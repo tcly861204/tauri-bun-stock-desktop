@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Header from './header'
 import { queryApi } from '@/libs/api'
 import { FundCard } from './fund-item'
 import { client } from '@/libs/orpc'
@@ -58,8 +59,9 @@ const Home = () => {
   }
   return (
     <section className='pt-5 pl-5 w-full relative min-h-[400px]'>
+      <Header />
       <section className='flex pr-4 gap-2'>
-        <section className='w-[300px] h-[calc(100vh-140px)] flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
+        <section className='w-[300px] h-[calc(100vh-226px)] flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
           {fundList.map((item) => (
             <FundCard
               key={item.code}

@@ -24,6 +24,7 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
           .filter((item) => item.isYLine || item.isLongShadow)
           .filter(isValidStock)
           .filter((item) => item.market_cap > 0 && item.market_cap < 120)
+          .filter((item) => item.price !== undefined && item.price < 60)
           .sort((a, b) => b.profit - a.profit)
       )
     })
