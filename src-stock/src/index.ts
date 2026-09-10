@@ -1,8 +1,9 @@
 #!/usr/bin/env bun
 import { Command } from 'commander'
 import { select as inqSelect } from '@inquirer/prompts'
-import update_cmd from './command/update.ts'
-import download_cmd from './command/download.ts'
+import update_cmd from '@/commands/update.ts'
+import download_cmd from '@/commands/download.ts'
+import king_cmd from '@/commands/king.ts'
 const program = new Command()
 program
   .name('stock')
@@ -12,6 +13,7 @@ program
     const choices = [
       { name: '⬇️  Download stock data', value: 'download' },
       { name: '🔄 Update kline data from real-time quote', value: 'update' },
+      { name: '📈 Top 涨幅榜', value: 'king' },
     ]
     try {
       let selectedKey: string
@@ -22,16 +24,21 @@ program
       })
       switch (selectedKey) {
         case 'download':
-          const { handleDownload } = await import('./command/download.ts')
+          const { handleDownload } = await import('@/commands/download.ts')
           await handleDownload()
           break
         case 'update':
-          const { handleUpdate } = await import('./command/update.ts')
+          const { handleUpdate } = await import('@/commands/update.ts')
           await handleUpdate()
+          break
+        case 'king':
+          const { handleKing } = await import('@/commands/king.ts')
+          await handleKing()
           break
       }
     } catch (_) {}
   })
   .addCommand(update_cmd)
   .addCommand(download_cmd)
+  .addCommand(king_cmd)
 program.parse(process.argv)

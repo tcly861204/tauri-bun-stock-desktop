@@ -1,23 +1,34 @@
-import { queryStocks } from './db'
-import { logError, ProgressBar } from './log'
-import { getBatchRealtimeQuotes } from './api'
-import { CONFIG } from './const'
+import { Command } from 'commander'
+import { select } from '@inquirer/prompts'
+import { printTitle, logError, ProgressBar } from '@/utils/format.ts'
+import { queryStockETFs, queryStocks } from '@/utils/db.ts'
+import { getBatchRealtimeQuotes } from '@/utils/api.ts'
+import { formatDate, formatNum } from '@/utils/util'
+import { CONFIG } from '@/utils/const'
 import { join } from 'node:path'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-
-function formatDate(date: string): string {
-  return `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`
+const program = new Command()
+export const handleUpdate = async () => {
+  printTitle('🔄 Update kline data from real-time quote')
+  const choice = await select({
+    message: '请选择更新类型',
+    choices: [
+      { name: '📈 Stock', value: 'stock' },
+      { name: '📊 ETF', value: 'etf' },
+    ],
+  })
+  if (choice === 'stock') {
+    await onhandleUpdate(true)
+  } else {
+    await onhandleUpdate(false)
+  }
 }
 
-function formatNum(num: string): string {
-  const [int, frac] = num.split('.')
-  return `${int}.${(frac ?? '000').padEnd(3, '0')}`
-}
-
-export const updateStocks = async () => {
-  const stockList = await queryStocks()
+async function onhandleUpdate(isStock: boolean) {
+  // 实现更新逻辑
+  const stockList = isStock ? await queryStocks() : await queryStockETFs()
   if (stockList.length === 0) {
-    logError('stock.db 中没有股票数据')
+    logError(`stock.db 中没有${isStock ? '股票' : 'ETF'}数据`)
     return
   }
   const BATCH_SIZE = 200
@@ -27,11 +38,9 @@ export const updateStocks = async () => {
   let errorCount = 0
   for (let start = 0; start < stockList.length; start += BATCH_SIZE) {
     const batch = stockList.slice(start, start + BATCH_SIZE)
-
     // 1. 批量获取这一批的实时行情
     const symbols = batch.map((s) => `${s.type === 0 ? 'sz' : 'sh'}${s.code}`)
     const quoteLines: string[] = await getBatchRealtimeQuotes(symbols)
-
     // 2. 解析行情，建立 code -> { date, value[] } 映射
     const quoteMap = new Map<string, { date: string; value: string[]; info: string[] }>()
     for (const line of quoteLines) {
@@ -56,13 +65,12 @@ export const updateStocks = async () => {
         } catch (_) {}
       }
     }
-
     // 3. 并发更新本地 K 线文件（各股票独立操作互不冲突）
     const results = await Promise.allSettled(
       batch.map(async ({ type, code, name }) => {
         const prefix = type === 0 ? 'sz' : 'sh'
         const symbolKey = `${prefix}${code}`
-        const filePath = join(CONFIG.DATA_DIR, `${code}.json`)
+        const filePath = join(isStock ? CONFIG.DATA_DIR : CONFIG.DATA_ETF_DIR, `${code}.json`)
         const quote = quoteMap.get(code)
 
         if (!quote) return 'error'
@@ -97,7 +105,7 @@ export const updateStocks = async () => {
           } else {
             klineArr.push(quote.value)
           }
-          writeFileSync(filePath, JSON.stringify(root, null, 2))
+          writeFileSync(filePath, root, 'utf-8')
           return klineArr[lastIdx][0] === quote.date ? 'updated' : 'new'
         } catch (_) {
           pb.println(`  ❌ ${code} ${name} - 更新失败`)
@@ -105,7 +113,7 @@ export const updateStocks = async () => {
         }
       })
     )
-
+    // 4. 统计更新结果
     for (const r of results) {
       if (r.status === 'fulfilled') {
         if (r.value === 'updated') updatedCount++
@@ -117,9 +125,10 @@ export const updateStocks = async () => {
       pb.inc(1)
     }
   }
-
   pb.finish('更新完成')
   console.log(
     `\n  总处理: ${stockList.length} | 更新: ${updatedCount} | 新增: ${newCount} | 失败/跳过: ${errorCount}`
   )
 }
+
+export default program.name('update').description('通过实时行情更新本地 K 线').action(handleUpdate)

@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "devDependencies": {
+    "@types/big.js": "^7.0.0",
     "@types/bun": "latest"
   },
   "peerDependencies": {
@@ -10,6 +11,7 @@
   },
   "dependencies": {
     "@inquirer/prompts": "^8.7.2",
+    "big.js": "^7.0.1",
     "commander": "^15.0.0"
   }
 }
