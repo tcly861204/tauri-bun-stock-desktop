@@ -4,6 +4,7 @@ import RSIChart from '../rsi-chart/index'
 import CanvasCCIChart from '../cci-chart/index'
 import KlineHeader from '../kline-header/index'
 import { queryDayKline } from '@/libs/api'
+import NoSet from './noSet'
 import Loading from '../loading'
 import { get } from 'lodash-es'
 import { divide, round, subtract } from '@/libs/math'
@@ -85,16 +86,19 @@ const Stock = ({
   return (
     <section className='flex-1 flex h-full gap-2'>
       <section className='flex flex-col relative flex-1'>
+        {!code && <NoSet />}
         {loading ? <Loading /> : null}
-        <KlineHeader
-          stockTime={stockTime}
-          code={code}
-          stockExt={stockExt}
-          stockName={stockName}
-          stockPrice={stockPrice}
-          stockRate={stockRate}
-          isETF={isETF}
-        />
+        <div key={code}>
+          <KlineHeader
+            stockTime={stockTime}
+            code={code}
+            stockExt={stockExt}
+            stockName={stockName}
+            stockPrice={stockPrice}
+            stockRate={stockRate}
+            isETF={isETF}
+          />
+        </div>
         <section className='flex-1'>
           <KlineChart viewCount={60} data={kline} buyDate={buyDate} weekData={weekKline} />
           <RSIChart viewCount={60} data={kline} />

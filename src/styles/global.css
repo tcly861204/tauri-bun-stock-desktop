@@ -196,3 +196,15 @@
   background-size: 200% 200%;
   animation: shimmerGradient 4s ease infinite;
 }
+
+/* 尊重「减少动效」偏好：直接呈现动画终态，不强制播放 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

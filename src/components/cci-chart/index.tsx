@@ -289,7 +289,7 @@ const CanvasCCIChart: React.FC<Props> = ({ data, height = 240, viewCount = 80 })
   }
 
   return (
-    <section className='relative flex gap-[1px]'>
+    <section className='relative flex gap-[1px] rounded-b-md overflow-hidden'>
       <MACDChart data={data} height={height} viewCount={viewCount} />
       <div
         className='bg-white flex-1'
