@@ -7,7 +7,7 @@ type Props = {
 
 const Search = ({ keyword, setkeyword, onSearch }: Props) => {
   return (
-    <section className='flex-shrink-0 mb-2 flex items-stretch pr-[4px]'>
+    <section className='flex-shrink-0 mb-2 flex items-stretch pr-[3px]'>
       <input
         className='flex-1 min-w-0 h-[32px] px-2 text-sm bg-white text-gray-700 placeholder:text-gray-400 border-none outline-none rounded-l-sm'
         placeholder='搜索ETF代码或名称'

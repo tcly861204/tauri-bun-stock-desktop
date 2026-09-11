@@ -17,7 +17,8 @@
         "height": 1080,
         "decorations": false,
         "center": true,
-        "maximized": true
+        "maximized": true,
+        "devtools": false
       }
     ],
     "security": {

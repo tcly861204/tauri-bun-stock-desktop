@@ -59,7 +59,7 @@ version = "1.0"
 
 [dependencies.tauri]
 version = "2.9.5"
-features = ["devtools"]
+features = []
 
 [dependencies.thiserror]
 version = "2"
