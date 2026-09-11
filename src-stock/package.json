@@ -2,6 +2,9 @@
   "name": "src-stock",
   "module": "src/index.ts",
   "type": "module",
+  "scripts": {
+    "build:workers": "cd src/worker && bun build *.ts --outdir \"E:\\works\\tauri-bun-stock-desktop\\worker\" --target bun"
+  },
   "devDependencies": {
     "@types/big.js": "^7.0.0",
     "@types/bun": "latest"

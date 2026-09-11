@@ -333,7 +333,14 @@ export function loadAndAnalyze(
   filePath: string,
   name: string,
   rebackNum = 0
-): { code: string; analysis: AnalysisData; klines: KlineItem[]; turnoverRate: number; pe: number } {
+): {
+  code: string
+  analysis: AnalysisData
+  klines: KlineItem[]
+  turnoverRate: number
+  priceChange: number
+  pe: number
+} {
   const code = filePath.split(/[\\/]/).pop()?.replace('.json', '') ?? ''
   const jsonStr = readFileSync(filePath, 'utf-8')
   const klines = parseKlineFromJson(jsonStr)
@@ -357,6 +364,7 @@ export function loadAndAnalyze(
     analysis,
     klines: rebackNum > 0 ? klines.slice(0, 0 - rebackNum) : klines,
     turnoverRate: Number(info[38]), // 换手率（最新快照值，非历史值）
+    priceChange: Number(info[32]), // 涨跌幅
     pe: Number(info[39]),
   }
 }

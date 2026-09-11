@@ -5,6 +5,8 @@ import update_cmd from '@/commands/update.ts'
 import download_cmd from '@/commands/download.ts'
 import king_cmd from '@/commands/king.ts'
 import cron_cmd from '@/commands/cron.ts'
+import scan_cmd from '@/scan/index.ts'
+
 const program = new Command()
 program
   .name('stock')
@@ -15,6 +17,7 @@ program
       { name: '⬇️  Download stock data', value: 'download' },
       { name: '🔄 Update kline data from real-time quote', value: 'update' },
       { name: '📈 Top 涨幅榜', value: 'king' },
+      { name: '🌱 多模型扫描', value: 'scan' },
     ]
     try {
       let selectedKey: string
@@ -36,6 +39,10 @@ program
           const { handleKing } = await import('@/commands/king.ts')
           await handleKing()
           break
+        case 'scan':
+          const { handleScan } = await import('@/scan/index.ts')
+          await handleScan()
+          break
       }
     } catch (_) {}
   })
@@ -43,4 +50,5 @@ program
   .addCommand(download_cmd)
   .addCommand(king_cmd)
   .addCommand(cron_cmd)
+  .addCommand(scan_cmd)
 program.parse(process.argv)

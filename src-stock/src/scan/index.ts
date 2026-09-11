@@ -10,9 +10,10 @@ export const handleScan = async (options?: { rebackNum: number }) => {
   const stocks = await queryStocks()
   const results = await scanWithWorkers(stocks, CONFIG.DATA_DIR, options?.rebackNum || 0)
   console.log(`\n  ✅ 共 ${results.length} 只股票符合条件`)
+  console.log(results)
 }
 export default program
   .name('scan')
-  .description('🌱 均线多头小阳线(MA5>MA10>MA20, 收阳, 涨幅≤1%)')
+  .description('🌱 多模型扫描')
   .option('--rebackNum <number>', '回测天数', Number, 0)
   .action(handleScan)

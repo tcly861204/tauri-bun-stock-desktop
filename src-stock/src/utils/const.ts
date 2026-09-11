@@ -129,7 +129,7 @@ export const CONFIG = {
   /** 分析报告输出目录 */
   ANALYSIS_DIR: 'D:\\soft\\stock-app-local-data\\stock-analysis',
   /** Worker 脚本目录（编译后 exe 从此加载 worker） */
-  WORKER_DIR: 'D:\\soft\\stock-app-local-data\\worker',
+  WORKER_DIR: 'E:\\works\\tauri-bun-stock-desktop\\worker',
   /** 桌面 stock 目录（用于 hev 文件） */
   get DESKTOP_STOCK_DIR(): string {
     const home = process.env.USERPROFILE || 'C:\\Users\\default'
