@@ -10,15 +10,20 @@ import { writeFileSync } from 'node:fs'
 import { ensureDir } from '@/utils/file'
 
 const program = new Command()
-export const handleDownload = async () => {
+export const handleDownload = async (options?: { type: string }) => {
   printTitle('⬇️  Download stock data')
-  const choice = await select({
-    message: '请选择下载类型',
-    choices: [
-      { name: '📈 Stock', value: 'stock' },
-      { name: '📊 ETF', value: 'etf' },
-    ],
-  })
+  let choice = ''
+  if (options && options.type) {
+    choice = options.type
+  } else {
+    choice = await select({
+      message: '请选择下载类型',
+      choices: [
+        { name: '📈 Stock', value: 'stock' },
+        { name: '📊 ETF', value: 'etf' },
+      ],
+    })
+  }
   if (choice === 'stock') {
     await onHandleDownload(true)
   } else {
@@ -59,4 +64,8 @@ async function onHandleDownload(isStock: boolean) {
   pb.finish(`Stock 下载完成，所有数据已保存到 ${stockDir}`)
 }
 
-export default program.name('download').description('下载股票K线').action(handleDownload)
+export default program
+  .name('download')
+  .description('下载股票K线')
+  .option('--type <type>', '下载类型')
+  .action(handleDownload)

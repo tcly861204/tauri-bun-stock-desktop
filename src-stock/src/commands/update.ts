@@ -8,22 +8,26 @@ import { CONFIG } from '@/utils/const'
 import { join } from 'node:path'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 const program = new Command()
-export const handleUpdate = async () => {
+export const handleUpdate = async (options?: { type: string }) => {
   printTitle('🔄 Update kline data from real-time quote')
-  const choice = await select({
-    message: '请选择更新类型',
-    choices: [
-      { name: '📈 Stock', value: 'stock' },
-      { name: '📊 ETF', value: 'etf' },
-    ],
-  })
+  let choice = ''
+  if (options && options.type) {
+    choice = options.type
+  } else {
+    choice = await select({
+      message: '请选择更新类型',
+      choices: [
+        { name: '📈 Stock', value: 'stock' },
+        { name: '📊 ETF', value: 'etf' },
+      ],
+    })
+  }
   if (choice === 'stock') {
     await onhandleUpdate(true)
   } else {
     await onhandleUpdate(false)
   }
 }
-
 async function onhandleUpdate(isStock: boolean) {
   // 实现更新逻辑
   const stockList = isStock ? await queryStocks() : await queryStockETFs()
@@ -130,5 +134,8 @@ async function onhandleUpdate(isStock: boolean) {
     `\n  总处理: ${stockList.length} | 更新: ${updatedCount} | 新增: ${newCount} | 失败/跳过: ${errorCount}`
   )
 }
-
-export default program.name('update').description('通过实时行情更新本地 K 线').action(handleUpdate)
+export default program
+  .name('update')
+  .description('通过实时行情更新本地 K 线')
+  .option('--type <type>', '更新类型')
+  .action(handleUpdate)

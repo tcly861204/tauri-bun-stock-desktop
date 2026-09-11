@@ -38,7 +38,7 @@ export async function getBatchRealtimeQuotes(codes: string[]): Promise<string[]>
   const resp = await fetch(url)
   const buf = await resp.arrayBuffer()
   // @ts-ignore
-  return new TextDecoder('gbk').decode(buf).split('\n')
+  return new TextDecoder('gbk').decode(buf).split('\n').filter(Boolean)
 }
 
 /** 腾讯股票历史 K 线 API — 下载前复权日线

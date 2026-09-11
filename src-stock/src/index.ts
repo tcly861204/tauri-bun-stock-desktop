@@ -4,6 +4,7 @@ import { select as inqSelect } from '@inquirer/prompts'
 import update_cmd from '@/commands/update.ts'
 import download_cmd from '@/commands/download.ts'
 import king_cmd from '@/commands/king.ts'
+import cron_cmd from '@/commands/cron.ts'
 const program = new Command()
 program
   .name('stock')
@@ -11,7 +12,7 @@ program
   .version('1.0.0')
   .action(async () => {
     const choices = [
-      { name: '⬇️ Download stock data', value: 'download' },
+      { name: '⬇️  Download stock data', value: 'download' },
       { name: '🔄 Update kline data from real-time quote', value: 'update' },
       { name: '📈 Top 涨幅榜', value: 'king' },
     ]
@@ -41,4 +42,5 @@ program
   .addCommand(update_cmd)
   .addCommand(download_cmd)
   .addCommand(king_cmd)
+  .addCommand(cron_cmd)
 program.parse(process.argv)
