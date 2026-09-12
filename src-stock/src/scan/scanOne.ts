@@ -7,6 +7,7 @@ import { longShadow } from './patterns/longShadow.ts'
 import { ma5ReversalCross } from './patterns/ma5ReversalCross.ts'
 import { consecutiveRise } from './patterns/consecutiveRise.ts'
 import { volumeSurge } from './patterns/volumeSurge.ts'
+import { limitUpContinuation } from './patterns/limitUpContinuation.ts'
 export function scanOne(
   type: number,
   code: string,
@@ -45,6 +46,10 @@ export function scanOne(
     // 📈 成交量激增(20日均线向上, 60日均线向上, 20日均线>60日均线, 20日均线>60日均线, 20日均线>60日均线, 20日均线>60日均线)
     if (volumeSurge(analysis, turnoverRate, pe, priceChange) === true) {
       pattern.push('volume_surge')
+    }
+    // 📈 涨停延续(20日均线向上, 60日均线向上, 20日均线>60日均线, 20日均线>60日均线, 20日均线>60日均线, 20日均线>60日均线)
+    if (limitUpContinuation(code, klines) === true) {
+      pattern.push('one_word_up')
     }
     if (pattern.length === 0) return null
     return {

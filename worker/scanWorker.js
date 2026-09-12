@@ -560,6 +560,10 @@ var round2 = (number, precision = 2) => {
 function roundTo(v, digits) {
   return round2(v, digits);
 }
+function lastOpt(values) {
+  const v = values[values.length - 1];
+  return v ?? null;
+}
 function sma(values, period) {
   if (values.length < period)
     return values.map(() => null);
@@ -770,6 +774,7 @@ function loadAndAnalyze(filePath, name, rebackNum = 0) {
     analysis,
     klines: rebackNum > 0 ? klines.slice(0, 0 - rebackNum) : klines,
     turnoverRate: Number(info[38]),
+    priceChange: Number(info[32]),
     pe: Number(info[39])
   };
 }
@@ -835,6 +840,9 @@ function maAlignedUpSmallGain(analysis, turnoverRate, pe) {
 }
 
 // ../utils/ma.ts
+function ma5(a, i) {
+  return a.ma5[i] ?? 0;
+}
 var findLocalMinIndices = (values, lookRange) => {
   const result = [];
   for (let i = 0;i < values.length; i++) {
@@ -860,10 +868,11 @@ var findLocalMinIndices = (values, lookRange) => {
 };
 
 // ../scan/patterns/lastLowBreakoutBuy.ts
-function lastLowBreakoutBuy(analysis, klines, pe) {
+function lastLowBreakoutBuy(analysis, pe) {
+  const { klines } = analysis;
   if (klines.length < 10)
     return null;
-  const { high, ma5, ma10, ma20 } = analysis;
+  const { high, ma5: ma52, ma10, ma20 } = analysis;
   const closeValues = klines.map((v) => v === null ? undefined : v.close);
   const lowIndices = findLocalMinIndices(closeValues, 5);
   if (lowIndices.length === 0)
@@ -905,7 +914,7 @@ function lastLowBreakoutBuy(analysis, klines, pe) {
   }
   if (!conditionPass)
     return null;
-  const lastMa5 = ma5[lastIdx];
+  const lastMa5 = ma52[lastIdx];
   const lastMa10 = ma10[lastIdx];
   const lastMa20 = ma20[lastIdx];
   if (lastMa5 < lastMa10 && lastMa5 < lastMa20)
@@ -934,7 +943,7 @@ function hasLimitUpInLastN(code, klines, n) {
 }
 var minShadowBodyRatio = 3;
 function longShadow(code, analysis, pe) {
-  const { ma5, ma10, ma20, klines } = analysis;
+  const { ma5: ma52, ma10, ma20, klines } = analysis;
   if (pe <= 0)
     return null;
   if (hasLimitUpInLastN(code, klines, 3))
@@ -943,7 +952,7 @@ function longShadow(code, analysis, pe) {
   const minShadowPct = 2;
   const barIdx = klines.length - 1;
   const bar = klines[barIdx];
-  const v5 = ma5[barIdx];
+  const v5 = ma52[barIdx];
   const v10 = ma10[barIdx];
   const v20 = ma20[barIdx];
   if (v5 == null || v10 == null || v20 == null)
@@ -978,11 +987,483 @@ function longShadow(code, analysis, pe) {
   return true;
 }
 
+// ../scan/patterns/ma5ReversalCross.ts
+var WINDOW = 100;
+var TROUGH_LOOKBACK = 5;
+var MIN_DECLINE_BARS = 15;
+var MIN_DECLINE_PCT = 0.15;
+var MAX_UP_TICK_RATIO = 0.3;
+var MAX_DIST_LOW = 0.05;
+var MAX_PRICE_TROUGH = 0.06;
+var MIN_BARS = 100;
+function ma5ReversalCross(analysis) {
+  const { ma5: ma52, klines } = analysis;
+  const lastIdx = klines.length - 1;
+  const bar = klines[lastIdx];
+  if (lastIdx < MIN_BARS - 1)
+    return null;
+  const m5 = ma52[lastIdx];
+  const m5_1 = ma52[lastIdx - 1];
+  if (m5 == null || m5_1 == null)
+    return null;
+  const ma5Win = ma52.slice(-WINDOW);
+  const last = ma5Win.length - 1;
+  const m5Now = ma5Win[last];
+  if (m5Now == null)
+    return null;
+  let winMin = Infinity;
+  for (let i = 0;i < ma5Win.length; i++) {
+    const v = ma5Win[i];
+    if (v != null && v < winMin)
+      winMin = v;
+  }
+  if (winMin <= 0)
+    return null;
+  if ((m5Now - winMin) / winMin > MAX_DIST_LOW)
+    return null;
+  let troughIdx = last;
+  for (let i = Math.max(0, last - TROUGH_LOOKBACK + 1);i <= last; i++) {
+    const v = ma5Win[i];
+    if (v == null)
+      return null;
+    if (v < ma5Win[troughIdx])
+      troughIdx = i;
+  }
+  const troughVal = ma5Win[troughIdx];
+  if (troughIdx === last)
+    return null;
+  if (m5Now <= troughVal)
+    return null;
+  if (m5Now <= m5_1)
+    return null;
+  let peakIdx = -1;
+  let peakVal = -Infinity;
+  for (let i = 0;i <= troughIdx; i++) {
+    const v = ma5Win[i];
+    if (v == null)
+      continue;
+    if (v > peakVal) {
+      peakVal = v;
+      peakIdx = i;
+    }
+  }
+  if (peakIdx < 0 || peakVal <= 0)
+    return null;
+  const declineBars = troughIdx - peakIdx;
+  const declinePct = (peakVal - troughVal) / peakVal;
+  if (declineBars < MIN_DECLINE_BARS)
+    return null;
+  if (declinePct < MIN_DECLINE_PCT)
+    return null;
+  let upTicks = 0;
+  for (let i = peakIdx + 1;i <= troughIdx; i++) {
+    const prev = ma5Win[i - 1];
+    const cur = ma5Win[i];
+    if (prev != null && cur != null && cur > prev)
+      upTicks++;
+  }
+  if (upTicks > Math.max(2, Math.floor(declineBars * MAX_UP_TICK_RATIO)))
+    return null;
+  if ((bar.close - troughVal) / troughVal > MAX_PRICE_TROUGH)
+    return null;
+  if (bar.close <= m5)
+    return null;
+  if (bar.close <= bar.open)
+    return null;
+  return true;
+}
+
+// ../scan/patterns/consecutiveRise.ts
+function noMaCross(a, start, end) {
+  const v5s = a.ma5[start];
+  const v10s = a.ma10[start];
+  const v20s = a.ma20[start];
+  if (v5s == null || v10s == null || v20s == null)
+    return false;
+  const init5v10 = v5s - v10s;
+  const init5v20 = v5s - v20s;
+  const init10v20 = v10s - v20s;
+  for (let i = start + 1;i <= end; i++) {
+    const v5 = a.ma5[i];
+    const v10 = a.ma10[i];
+    const v20 = a.ma20[i];
+    if (v5 == null || v10 == null || v20 == null)
+      return false;
+    if (v5 < v10 || v5 < v20 || v10 < v20)
+      return false;
+    if (init5v10 > 0 && v5 <= v10)
+      return false;
+    if (init5v10 < 0 && v5 >= v10)
+      return false;
+    if (init5v10 === 0 && v5 !== v10)
+      return false;
+    if (init5v20 > 0 && v5 <= v20)
+      return false;
+    if (init5v20 < 0 && v5 >= v20)
+      return false;
+    if (init5v20 === 0 && v5 !== v20)
+      return false;
+    if (init10v20 > 0 && v10 <= v20)
+      return false;
+    if (init10v20 < 0 && v10 >= v20)
+      return false;
+    if (init10v20 === 0 && v10 !== v20)
+      return false;
+  }
+  return true;
+}
+function isArcTop(a) {
+  const n = a.close.length;
+  const m0 = a.ma5[n - 4];
+  const m1 = a.ma5[n - 3];
+  const m2 = a.ma5[n - 2];
+  const m3 = a.ma5[n - 1];
+  if (m0 == null || m1 == null || m2 == null || m3 == null)
+    return false;
+  const d1 = m1 - m0;
+  const d2 = m2 - m1;
+  const d3 = m3 - m2;
+  return d3 > 0 && d3 < d2 && d2 < d1;
+}
+function consecutiveRise(a) {
+  const opts = {
+    daysRange: [6, 6],
+    maxDailyGain: 3,
+    minScore: 30,
+    maMode: "none",
+    requireExpandingBody: false,
+    maxPullbackDays: 1,
+    pullbackGainFloor: -0.5,
+    maxGainStdDev: 8 * 0.2
+  };
+  const close = a.close;
+  const n = close.length;
+  if (n < 10)
+    return null;
+  const [minDays, maxDays] = opts.daysRange;
+  const pullbackFloor = opts.pullbackGainFloor ?? -0.5;
+  const maxPullback = opts.maxPullbackDays ?? (minDays >= 6 ? 1 : 0);
+  const lenient = maxPullback >= 1;
+  const maxGainStd = opts.maxGainStdDev ?? opts.maxDailyGain * 0.4;
+  let maxBackDays = 0;
+  let pullbackUsed = 0;
+  for (let i = n - 1;i >= 1; i--) {
+    const g = (close[i] - close[i - 1]) / close[i - 1] * 100;
+    if (g > 0) {
+      maxBackDays++;
+    } else if (i < n - 1 && maxPullback > 0 && pullbackUsed < maxPullback && g >= pullbackFloor) {
+      maxBackDays++;
+      pullbackUsed++;
+    } else {
+      break;
+    }
+  }
+  const requireYang = opts.requireYang ?? true;
+  const maMode = opts.maMode ?? "strict";
+  const candidateUpper = Math.min(maxBackDays, maxDays);
+  for (let days = candidateUpper;days >= minDays; days--) {
+    const start = n - days;
+    let valid = true;
+    const pullbackIdx = new Set;
+    for (let i = start;i < n; i++) {
+      const gainPct = (close[i] - close[i - 1]) / close[i - 1] * 100;
+      if (gainPct > opts.maxDailyGain) {
+        valid = false;
+        break;
+      }
+      if (gainPct <= 0) {
+        if (i === n - 1 || maxPullback <= 0 || gainPct < pullbackFloor) {
+          valid = false;
+          break;
+        }
+        pullbackIdx.add(i);
+        continue;
+      }
+      if (!lenient) {
+        if (requireYang && a.klines[i].close <= a.klines[i].open) {
+          valid = false;
+          break;
+        }
+        if (i > start && a.klines[i].open <= a.klines[i - 1].open) {
+          valid = false;
+          break;
+        }
+      }
+    }
+    if (!valid || pullbackIdx.size > maxPullback)
+      continue;
+    {
+      let sum = 0;
+      const gains2 = [];
+      for (let i = start;i < n; i++) {
+        const g = (close[i] - close[i - 1]) / close[i - 1] * 100;
+        gains2.push(g);
+        sum += g;
+      }
+      const mean = sum / gains2.length;
+      let varSum2 = 0;
+      for (const g of gains2)
+        varSum2 += (g - mean) ** 2;
+      const stdDev2 = Math.sqrt(varSum2 / gains2.length);
+      if (stdDev2 > maxGainStd)
+        continue;
+    }
+    const lastK = a.klines[n - 1];
+    const lastBody = Math.abs(lastK.close - lastK.open);
+    const lastUpperShadow = lastK.high - Math.max(lastK.close, lastK.open);
+    if (Math.round(lastUpperShadow * 100) > Math.round(lastBody * 100))
+      continue;
+    const biasMa20 = a.ma20[n - 1];
+    if (biasMa20 != null) {
+      const bias20 = (close[n - 1] - biasMa20) / biasMa20 * 100;
+      if (bias20 > (opts.maxBias20 ?? 12))
+        continue;
+    }
+    if (opts.requireExpandingBody) {
+      let prevBody = 0;
+      for (let i = start;i < n; i++) {
+        if (pullbackIdx.has(i))
+          continue;
+        const body = a.klines[i].close - a.klines[i].open;
+        if (body <= prevBody) {
+          valid = false;
+          break;
+        }
+        prevBody = body;
+      }
+      if (!valid)
+        continue;
+    }
+    if (!lenient) {
+      for (let i = start + 1;i < n; i++) {
+        if ((a.macd_macd[i] ?? 0) <= (a.macd_macd[i - 1] ?? 0)) {
+          valid = false;
+          break;
+        }
+      }
+      if (!valid)
+        continue;
+    }
+    if (maMode === "ma20Only") {
+      if (!lenient) {
+        for (let i = start + 1;i < n; i++) {
+          if ((a.ma20[i] ?? 0) <= (a.ma20[i - 1] ?? 0)) {
+            valid = false;
+            break;
+          }
+        }
+        if (!valid)
+          continue;
+      }
+    } else if (maMode === "ma5Only") {
+      if (!lenient) {
+        for (let i = start + 1;i < n; i++) {
+          if ((a.ma5[i] ?? 0) <= (a.ma5[i - 1] ?? 0)) {
+            valid = false;
+            break;
+          }
+        }
+        if (!valid)
+          continue;
+      }
+    } else if (maMode === "ma10Only") {
+      if (!lenient) {
+        for (let i = start + 1;i < n; i++) {
+          if ((a.ma10[i] ?? 0) <= (a.ma10[i - 1] ?? 0)) {
+            valid = false;
+            break;
+          }
+        }
+        if (!valid)
+          continue;
+      }
+    } else if (maMode === "none") {} else {
+      if (opts.requireNoMaCross ?? true) {
+        if (!noMaCross(a, start, n - 1))
+          continue;
+      }
+    }
+    {
+      let aboveCount = 0;
+      for (let i = start;i < n; i++) {
+        const m5 = a.ma5[i];
+        const m10 = a.ma10[i];
+        const m20 = a.ma20[i];
+        if (m5 == null || m10 == null || m20 == null)
+          continue;
+        if (m5 >= m10 || m5 >= m20)
+          aboveCount++;
+      }
+      if (aboveCount < 2)
+        continue;
+    }
+    const lastMa5 = a.ma5[n - 1];
+    const lastMa10 = a.ma10[n - 1];
+    const lastMa20 = a.ma20[n - 1];
+    if (lastMa5 <= lastMa10 || lastMa5 <= lastMa20)
+      continue;
+    if (lastK.low > lastMa5)
+      continue;
+    if (isArcTop(a))
+      continue;
+    let score = 0;
+    const latestDif = lastOpt(a.macd_dif) ?? 0;
+    if (days >= 5)
+      score += 50;
+    else if (days >= 4)
+      score += 40;
+    else
+      score += 30;
+    let sumGain = 0;
+    const gains = [];
+    for (let i = start;i < n; i++) {
+      const g = (close[i] - close[i - 1]) / close[i - 1] * 100;
+      sumGain += g;
+      gains.push(g);
+    }
+    const avgGain = sumGain / gains.length;
+    let varSum = 0;
+    for (const g of gains)
+      varSum += (g - avgGain) ** 2;
+    const stdDev = Math.sqrt(varSum / gains.length);
+    if (stdDev < 0.3)
+      score += 20;
+    else if (stdDev < 0.6)
+      score += 10;
+    if (latestDif > 1)
+      score += 15;
+    else if (latestDif > 0.5)
+      score += 10;
+    else
+      score += 5;
+    const ma5Start = ma5(a, start);
+    const ma5End = ma5(a, n - 1);
+    if (ma5Start > 0.0000000001) {
+      const ma5Slope = (ma5End - ma5Start) / ma5Start;
+      if (ma5Slope > 0.03)
+        score += 15;
+      else if (ma5Slope > 0.015)
+        score += 10;
+      else
+        score += 5;
+    }
+    const finalScore = Math.max(0, Math.min(100, score));
+    if (finalScore < opts.minScore)
+      continue;
+    let totalGain = 0;
+    for (let i = start;i < n; i++) {
+      totalGain += (close[i] - close[i - 1]) / close[i - 1] * 100;
+    }
+    return true;
+  }
+  return null;
+}
+
+// ../scan/patterns/volumeSurge.ts
+var shortPeriod = 5;
+var longPeriod = 40;
+var minRatio = 1.5;
+var TREND_NEAR_HIGH_RATIO = 0.9;
+var MIN_TREND_SCORE = 3;
+function calcTrendScore(klines) {
+  const closes = klines.map((k) => k.close);
+  const ma20Arr = sma(closes, 20);
+  const ma60Arr = sma(closes, 60);
+  const { bar: macdBars } = calcMacd(closes);
+  const lastClose = closes[closes.length - 1];
+  const lastMa20 = ma20Arr[ma20Arr.length - 1];
+  const lastMa60 = ma60Arr[ma60Arr.length - 1];
+  const lastMacdBar = macdBars[macdBars.length - 1];
+  let score = 0;
+  if (lastMa20 !== null && lastClose > lastMa20)
+    score += 1;
+  if (lastMa60 !== null && lastClose > lastMa60)
+    score += 1;
+  if (lastMa20 !== null && lastMa60 !== null && lastMa20 > lastMa60)
+    score += 1;
+  if (lastMacdBar > 0)
+    score += 1;
+  const recentHigh = Math.max(...closes.slice(-60));
+  if (lastClose >= recentHigh * TREND_NEAR_HIGH_RATIO)
+    score += 1;
+  return score;
+}
+function volumeSurge(analysis, turnoverRate, pe, priceChange) {
+  const { klines } = analysis;
+  if (klines.length < longPeriod + 1)
+    return null;
+  if (turnoverRate < 1 || turnoverRate > 10)
+    return null;
+  if (pe <= 0)
+    return null;
+  if (priceChange < -5 || priceChange > 7)
+    return null;
+  const closes = klines.map((k) => k.close);
+  const vols = klines.map((k) => k.vol);
+  const lastBar = klines[klines.length - 1];
+  const avgShort = vols.slice(-shortPeriod).reduce((a, b) => a + b, 0) / shortPeriod;
+  const avgLong = vols.slice(-longPeriod).reduce((a, b) => a + b, 0) / longPeriod;
+  if (avgLong <= 0)
+    return null;
+  const ratio = avgShort / avgLong;
+  if (ratio < minRatio)
+    return null;
+  const trendScore = calcTrendScore(klines);
+  if (trendScore < MIN_TREND_SCORE)
+    return null;
+  const ma20 = sma(closes, 20);
+  const lastMa20 = ma20[ma20.length - 1];
+  const prevMa20 = ma20[ma20.length - 2];
+  const lastClose = closes[closes.length - 1];
+  if (lastMa20 === null || prevMa20 === null || lastMa20 <= prevMa20 || lastClose <= lastMa20)
+    return null;
+  const { macd } = calcMacd(closes);
+  const lastMacd = macd[macd.length - 1];
+  const prevMacd = macd[macd.length - 2];
+  if (lastMacd < prevMacd || lastMacd <= 0)
+    return null;
+  return true;
+}
+
+// ../scan/patterns/limitUpContinuation.ts
+function limitUpThreshold2(code) {
+  if (code.startsWith("30") || code.startsWith("688"))
+    return 0.195;
+  return 0.095;
+}
+function limitUpContinuation(code, klines) {
+  if (klines.length < 30)
+    return null;
+  const last = klines[klines.length - 1];
+  const prev = klines[klines.length - 2];
+  if (prev.close <= 0)
+    return null;
+  const threshold = limitUpThreshold2(code);
+  const pct = (last.close - prev.close) / prev.close;
+  if (pct < threshold)
+    return null;
+  const sealed = last.close === last.high;
+  if (!sealed)
+    return null;
+  const oneWord = last.open === last.close && last.close === last.high;
+  let boards = 1;
+  for (let j = klines.length - 2;j >= 1; j--) {
+    const p = klines[j - 1].close;
+    if (p > 0 && (klines[j].close - p) / p >= threshold)
+      boards++;
+    else
+      break;
+  }
+  if (boards > 6)
+    return null;
+  return true;
+}
+
 // ../scan/scanOne.ts
 function scanOne(type, code, name, dataDir, rebackNum) {
   try {
     const filePath = join(dataDir, `${code}.json`);
-    const { analysis, turnoverRate, pe } = loadAndAnalyze(filePath, name, rebackNum);
+    const { analysis, turnoverRate, pe, priceChange } = loadAndAnalyze(filePath, name, rebackNum);
     const { klines } = analysis;
     const barIdx = klines.length - 1;
     const bar = klines[barIdx];
@@ -992,11 +1473,23 @@ function scanOne(type, code, name, dataDir, rebackNum) {
     if (maAlignedUpSmallGain(analysis, turnoverRate, pe) === true) {
       pattern.push("up_small_gain");
     }
-    if (lastLowBreakoutBuy(analysis, klines, pe) === true) {
+    if (lastLowBreakoutBuy(analysis, pe) === true) {
       pattern.push("buy_signal");
     }
     if (longShadow(code, analysis, pe) === true) {
       pattern.push("long_shadow");
+    }
+    if (ma5ReversalCross(analysis) === true) {
+      pattern.push("ma5_reversal_cross");
+    }
+    if (consecutiveRise(analysis) === true) {
+      pattern.push("consecutive_rise");
+    }
+    if (volumeSurge(analysis, turnoverRate, pe, priceChange) === true) {
+      pattern.push("volume_surge");
+    }
+    if (limitUpContinuation(code, klines) === true) {
+      pattern.push("one_word_up");
     }
     if (pattern.length === 0)
       return null;
