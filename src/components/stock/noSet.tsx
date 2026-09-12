@@ -1,4 +1,4 @@
-import { RadioTower } from 'lucide-react'
+import { Coffee } from 'lucide-react'
 const NoSet = () => {
   return (
     <section className='w-full h-full absolute top-0 left-0 bg-[#1e2025] rounded-md z-100 overflow-hidden flex flex-col items-center justify-center'>
@@ -14,7 +14,7 @@ const NoSet = () => {
       <div className='relative animate-scaleIn'>
         <div className='animate-floatSlow2'>
           <div className='w-[68px] h-[68px] rounded-2xl flex items-center justify-center bg-white/[0.03] border border-white/[0.08] backdrop-blur-sm shadow-[0_16px_40px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)]'>
-            <RadioTower size={30} strokeWidth={1.5} className='text-emerald-400' />
+            <Coffee size={30} strokeWidth={1.5} className='text-emerald-400' />
           </div>
         </div>
       </div>
