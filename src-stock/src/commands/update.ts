@@ -109,7 +109,7 @@ async function onhandleUpdate(isStock: boolean) {
           } else {
             klineArr.push(quote.value)
           }
-          writeFileSync(filePath, root, 'utf-8')
+          writeFileSync(filePath, JSON.stringify(root), 'utf-8')
           return klineArr[lastIdx][0] === quote.date ? 'updated' : 'new'
         } catch (_) {
           pb.println(`  ❌ ${code} ${name} - 更新失败`)

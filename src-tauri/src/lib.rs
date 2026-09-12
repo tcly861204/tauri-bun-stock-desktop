@@ -1,4 +1,4 @@
-// mod corn;
+mod corn;
 mod tray;
 use tauri::Manager; 
 
@@ -17,7 +17,7 @@ pub fn run() {
         .plugin(tauri_plugin_tauribun::init())
         .setup(|app| {
             tray::init(app)?;
-            // corn::init();
+            corn::init();
             Ok(())
         })
         .run(tauri::generate_context!())

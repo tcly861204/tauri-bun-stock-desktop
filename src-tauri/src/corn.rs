@@ -41,35 +41,28 @@ pub fn init() {
 
 fn build_jobs() -> Vec<Job> {
     let mut jobs = Vec::new();
-    // 周一~五 10:00 与 12:10（6 段 cron：秒 分 时 日 月 周）
-    // 每条任务可配不同参数：改 update_cmd(&[...]) 里的列表即可
-    if let Some(j) = Job::new_from_cmd(
-        "update-morning",
-        "0 0 10 * * 1-5",
-        update_cmd(&["--update", "--download"]),
-    ) {
-        jobs.push(j);
-    }
-    if let Some(j) = Job::new_from_cmd(
-        "update-noon",
-        "0 10 12 * * 1-5",
-        handle_cron("bun", &["--version"]),
-    ) {
-        jobs.push(j);
+    // (任务名, 6段cron: 秒 分 时 日 月 周, task 参数)
+    let specs: &[(&str, &str, &str)] = &[
+        ("update-morning-10", "0 0 10 * * 1-5",  "morning"),  // 周一~五 10:00
+        ("update-morning-12", "0 10 12 * * 1-5", "morning"),  // 周一~五 12:10
+        ("update-evening-10",    "0 10 14 * * 1-5", "evening"),  // 周一~五 14:10
+        ("update-evening-30",    "0 30 14 * * 1-5", "evening"),  // 周一~五 14:30
+    ];
+    for (name, schedule, task) in specs {
+        if let Some(j) = Job::new_from_cmd(name, schedule, tauri_stock_cron(task)) {
+            jobs.push(j);
+        }
     }
     jobs
 }
 
-/// 到点执行的命令：`bun run <worker.ts> [额外参数...]`（worker.ts 文件由使用者维护）。
-fn update_cmd(extra_args: &[&str]) -> (String, Vec<String>) {
-    let mut args = vec!["run".into(), r"D:\soft\stock-app-local-data\cron\worker.ts".into()];
-    args.extend(extra_args.iter().map(|s| s.to_string()));
-    ("bun".into(), args)
+fn tauri_stock_cron(task: &str) -> (String, Vec<String>) {
+    handle_cron("tauri-stock", &["cron", "--task", task])
 }
 
 /// 处理 cron 任务：`cmd [额外参数...]`（cmd 由使用者维护）。
 fn handle_cron(cmd: &str, extra_args: &[&str]) -> (String, Vec<String>) {
-    let mut args = extra_args.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+    let args = extra_args.iter().map(|s| s.to_string()).collect::<Vec<_>>();
     (cmd.into(), args)
 }
 

@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "compile": "bun run build:workers && bun build --compile ./src/index.ts --outfile \"$HOME/.bin/tauri-stock.exe\" && echo 全局命令 app 安装成功",
     "build:workers": "cd src/worker && bun build *.ts --outdir \"E:\\works\\tauri-bun-stock-desktop\\worker\" --target bun"
   },
   "devDependencies": {
