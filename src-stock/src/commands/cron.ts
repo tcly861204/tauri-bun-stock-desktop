@@ -1,6 +1,7 @@
 import { Command } from 'commander'
 import { printTitle } from '@/utils/format.ts'
 import { handleUpdate } from './update'
+import { cleanData } from '@/utils/clean.ts'
 import { handleScan } from '@/scan/index.ts'
 const program = new Command()
 export const handleCron = async (options: { task: string }) => {
@@ -23,7 +24,13 @@ export const handleCron = async (options: { task: string }) => {
       // 扫描股票
       await handleScan()
       break
-    case 'afternoon': // 下午 15:40
+    case 'afternoon': // 下午 15:35
+      // 更新股票数据
+      await handleUpdate({ type: 'stock' })
+      // 更新 ETF 数据
+      await handleUpdate({ type: 'etf' })
+      // 清理旧数据
+      await cleanData()
       break
   }
 }

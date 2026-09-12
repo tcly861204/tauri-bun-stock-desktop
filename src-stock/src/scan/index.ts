@@ -2,9 +2,9 @@ import { Command } from 'commander'
 import { printTitle } from '@/utils/format.ts'
 import { queryStocks } from '@/utils/db.ts'
 import { scanWithWorkers } from './withWorker.ts'
-import { CONFIG } from '@/utils/const.ts'
+import { CONFIG, partternTable } from '@/utils/const.ts'
 import { sleep } from 'bun'
-import { partternTable, writeDB } from './write.ts'
+import { writeDB } from './write.ts'
 const program = new Command()
 export const handleScan = async (options?: { rebackNum: number }) => {
   printTitle('\n📊 开始扫描均线多头小阳线(MA5>MA10>MA20, 收阳, 涨幅≤1%)...')

@@ -8,6 +8,7 @@ interface AverageType {
   ma5: number // 5日价格移动平均线
   ma10: number // 10日价格移动平均线
   ma20: number // 20日价格移动平均线
+  ma30: number // 30日价格移动平均线
   ma60: number // 60日价格移动平均线
   volume: number // 当日成交量
   avgVol5: number // 5日成交量移动平均线
@@ -65,6 +66,7 @@ export const calculateMA = (
   const ma5 = calcSMA(closePrices, 5)
   const ma10 = calcSMA(closePrices, 10)
   const ma20 = calcSMA(closePrices, 20)
+  const ma30 = calcSMA(closePrices, 30)
   const ma60 = calcSMA(closePrices, 60)
 
   const avgVol5 = calcSMA(volumes, 5)
@@ -81,6 +83,7 @@ export const calculateMA = (
       ma5: ma5[i],
       ma10: ma10[i],
       ma20: ma20[i],
+      ma30: ma30[i],
       ma60: ma60[i],
       avgVol5: avgVol5[i],
       avgVol10: avgVol10[i],

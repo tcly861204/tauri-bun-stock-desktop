@@ -157,3 +157,13 @@ export function getMarketPrefix(rawCode: string): string {
   }
   return 'sz'
 }
+
+export const partternTable = [
+  'up_small_gain',
+  'buy_signal',
+  'long_shadow',
+  'ma5_reversal_cross',
+  'consecutive_rise',
+  'volume_surge',
+  'one_word_up',
+]

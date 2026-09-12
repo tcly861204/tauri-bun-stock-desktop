@@ -5,13 +5,14 @@ import MACDChart from '../macd-chat'
 import { drawNuclearWarning } from './drawWarningEffect'
 import { drawBuySignal } from './useDrawBuySignal'
 import { useLastLowBreakoutBuy, useSellSignalIndices } from './useSignal'
-const MA_TYPES = ['ma5', 'ma10', 'ma20', 'ma60'] as const
+const MA_TYPES = ['ma5', 'ma10', 'ma20', 'ma30', 'ma60'] as const
 type MaType = (typeof MA_TYPES)[number]
 const MA_VISIBILITY_KEY = 'kline-chart-ma-visibility'
 const MA_VISIBILITY_DEFAULT: Record<MaType, boolean> = {
   ma5: true,
   ma10: true,
   ma20: true,
+  ma30: true,
   ma60: true,
 }
 
@@ -309,6 +310,7 @@ const Kline: React.FC<Props> = ({ data, buyDate, weekData, height = 288, viewCou
         ma5: '#5682ff',
         ma10: '#f0d070',
         ma20: '#ffb0ff',
+        ma30: '#ff9900',
         ma60: '#008000',
       }
 
@@ -317,6 +319,7 @@ const Kline: React.FC<Props> = ({ data, buyDate, weekData, height = 288, viewCou
         { name: 'MA5', color: maColors.ma5, type: 'ma5' },
         { name: 'MA10', color: maColors.ma10, type: 'ma10' },
         { name: 'MA20', color: maColors.ma20, type: 'ma20' },
+        { name: 'MA30', color: maColors.ma30, type: 'ma30' },
         { name: 'MA60', color: maColors.ma60, type: 'ma60' },
       ]
 
@@ -327,7 +330,7 @@ const Kline: React.FC<Props> = ({ data, buyDate, weekData, height = 288, viewCou
         const hidden = !maVisibility[item.type]
         const hovered = hoveredLegend === idx
         ctx.fillStyle = hidden ? '#ccc' : item.color
-        ctx.fillRect(legendX, legendY, 15, 3)
+        ctx.fillRect(legendX, legendY - 1, 15, 3)
         ctx.fillStyle = hidden ? '#ccc' : hovered ? '#111' : '#333'
         ctx.textAlign = 'left'
         ctx.textBaseline = 'middle'

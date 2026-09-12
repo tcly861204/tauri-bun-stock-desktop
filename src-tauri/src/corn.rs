@@ -47,6 +47,7 @@ fn build_jobs() -> Vec<Job> {
         ("update-morning-12", "0 10 12 * * 1-5", "morning"),  // 周一~五 12:10
         ("update-evening-10",    "0 10 14 * * 1-5", "evening"),  // 周一~五 14:10
         ("update-evening-30",    "0 30 14 * * 1-5", "evening"),  // 周一~五 14:30
+        ("update-afternoon-35",    "0 35 15 * * 1-5", "afternoon"),  // 周一~五 14:30
     ];
     for (name, schedule, task) in specs {
         if let Some(j) = Job::new_from_cmd(name, schedule, tauri_stock_cron(task)) {

@@ -1,15 +1,6 @@
 import { logSuccess } from '@/utils/format.ts'
 import { getDb } from '@/utils/db.ts'
 import { type ScanResult } from './type.ts'
-export const partternTable = [
-  'up_small_gain',
-  'buy_signal',
-  'long_shadow',
-  'ma5_reversal_cross',
-  'consecutive_rise',
-  'volume_surge',
-  'one_word_up',
-]
 export function writeDB(tableName: string, results: ScanResult[]) {
   const db = getDb()
   db.run(`DELETE FROM ${tableName} WHERE date='${results[0]!.lastDate}'`)
