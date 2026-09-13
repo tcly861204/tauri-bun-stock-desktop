@@ -4,6 +4,7 @@ import StockItem from '@/components/stock-item'
 import { isValidStock } from '@/libs/utils'
 import Search from '@/components/search'
 import { useSidebar } from '@/hooks/useSidebar'
+import { useSidebarScroll } from '@/hooks/useSidebarScroll'
 
 type Props = {
   panel: string
@@ -29,6 +30,11 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
       )
     })
   }, [tab, panel, fetchStocks])
+  const { listRef, handleKeyDown } = useSidebarScroll({
+    sideList,
+    selectCode,
+    setSelectCode,
+  })
   const onSearch = useCallback(() => {
     fetchStocks(
       keyword && keyword.length
@@ -41,7 +47,12 @@ const Sidebar: FC<Props> = ({ panel, tab, selectCode, setSelectCode }) => {
   return (
     <section className='w-[240px] h-[calc(100vh-226px)] relative flex flex-col pr-1'>
       <Search keyword={keyword} setkeyword={setkeyword} onSearch={onSearch} />
-      <section className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'>
+      <section
+        ref={listRef}
+        className='flex-1 flex flex-col gap-2 overflow-auto overflow-x-hidden scrollbar outline-none'
+        tabIndex={-1}
+        onKeyDown={handleKeyDown}
+      >
         {loading ? (
           <Skeleton />
         ) : (

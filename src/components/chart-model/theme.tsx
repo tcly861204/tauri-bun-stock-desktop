@@ -1,9 +1,10 @@
-import { useEffect, useRef, useCallback, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import StockItem from '@/components/stock-item'
 import Skeleton from '@/components/skeleton'
 import { round } from '@/libs/math'
 import { isValidStock } from '@/libs/utils'
 import { useSidebar } from '@/hooks/useSidebar'
+import { useSidebarScroll } from '@/hooks/useSidebarScroll'
 export function ThemePanel({
   selectCode,
   themeCode,
@@ -27,32 +28,11 @@ export function ThemePanel({
       )
     })
   }, [themeCode])
-  const listRef = useRef<HTMLDivElement>(null)
-  const selectedIndex = sideList.findIndex((item) => `${item.type}-${item.code}` === selectCode)
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        if (selectedIndex > 0) {
-          setSelectCode(`${sideList[selectedIndex - 1].type}-${sideList[selectedIndex - 1].code}`)
-        }
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        if (selectedIndex < sideList.length - 1) {
-          setSelectCode(`${sideList[selectedIndex + 1].type}-${sideList[selectedIndex + 1].code}`)
-        }
-      }
-    },
-    [selectedIndex, sideList, setSelectCode]
-  )
-  useEffect(() => {
-    if (!listRef.current || !selectCode) return
-    const el = listRef.current.querySelector(`[data-code="${selectCode}"]`)
-    el?.scrollIntoView({ block: 'nearest' })
-  }, [selectCode])
-  useEffect(() => {
-    listRef.current?.focus()
-  }, [sideList.length])
+  const { listRef, handleKeyDown } = useSidebarScroll({
+    sideList,
+    selectCode,
+    setSelectCode,
+  })
   const avgChange = useMemo(() => {
     const ch = sideList.filter((s) => s.profit !== null).map((s) => s.profit!)
     const avg = ch.length ? ch.reduce((a, b) => a + b, 0) / ch.length : 0
