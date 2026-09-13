@@ -1,8 +1,9 @@
 import { Command } from 'commander'
 import { printTitle } from '@/utils/format.ts'
 import { handleUpdate } from './update'
-import { cleanData } from '@/utils/clean.ts'
+import { cleanData, cleanTopStock } from '@/utils/clean.ts'
 import { handleScan } from '@/scan/index.ts'
+import { sleep } from 'bun'
 const program = new Command()
 export const handleCron = async (options: { task: string }) => {
   printTitle('🔄 Cron task')
@@ -31,6 +32,10 @@ export const handleCron = async (options: { task: string }) => {
       await handleUpdate({ type: 'etf' })
       // 清理旧数据
       await cleanData()
+      // 等待100ms， 确保数据库操作完成
+      await sleep(100)
+      // 清理涨停板旧数据
+      await cleanTopStock()
       break
   }
 }

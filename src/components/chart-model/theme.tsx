@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
-import { queryApi, queryStockRealtime } from '@/libs/api'
+import { useEffect, useRef, useCallback, useMemo } from 'react'
 import StockItem from '@/components/stock-item'
-import type { SidebarItem } from '@/components/stock-item'
 import Skeleton from '@/components/skeleton'
 import { round } from '@/libs/math'
-import { mergeStockCodes } from '@/libs/utils'
+import { isValidStock } from '@/libs/utils'
+import { useSidebar } from '@/hooks/useSidebar'
 export function ThemePanel({
   selectCode,
   themeCode,
@@ -16,48 +15,17 @@ export function ThemePanel({
   setSelectCode: (code: string) => void
   extInfo?: Record<string, any>
 }) {
-  const [sideList, setSideList] = useState<SidebarItem[]>([])
-  const [loading, setLoading] = useState(false)
+  const { sideList, setSideList, loading, fetchStocks } = useSidebar()
   useEffect(() => {
-    setLoading(true)
-    queryApi(
+    fetchStocks(
       `SELECT type, code, name, lowDay, profit, market_cap, is_hidden as hidden FROM sector_stocks WHERE is_etf = 0 AND is_hidden = 0 AND (sector_code = '${themeCode}' OR sub_sector_name = '${themeCode}')`
-    )
-      .then(async (res) => {
-        const codes = mergeStockCodes(res as { type: number; code: string }[])
-        const stocks: Record<string, SidebarItem> = res.reduce((prev: any, cur: any) => {
-          prev[cur.code] = {
-            ...cur,
-            price: 0,
-            profit: 0,
-            isYLine: false,
-            isLongShadow: false,
-            market_cap: 0,
-          }
-          return prev
-        }, {}) as Record<string, SidebarItem>
-        await queryStockRealtime(codes, (info) => {
-          stocks[info.code].profit = info.profit
-          stocks[info.code].market_cap = info.market_cap
-          stocks[info.code].price = info.price
-          stocks[info.code].isYLine = info.isYLine
-          stocks[info.code].isLongShadow = info.isLongShadow
-        })
-        setSideList(
-          Object.values(stocks)
-            .filter(
-              (item) =>
-                !(
-                  item.name.includes('退') ||
-                  item.name.includes('停') ||
-                  item.name.includes('st') ||
-                  item.name.includes('ST')
-                )
-            )
-            .sort((a, b) => b.profit - a.profit)
-        )
-      })
-      .finally(() => setLoading(false))
+    ).then((stocks) => {
+      setSideList(
+        Object.values(stocks!)
+          .filter(isValidStock)
+          .sort((a, b) => b.profit - a.profit)
+      )
+    })
   }, [themeCode])
   const listRef = useRef<HTMLDivElement>(null)
   const selectedIndex = sideList.findIndex((item) => `${item.type}-${item.code}` === selectCode)
