@@ -70,11 +70,9 @@ export async function getHistoryTopicRise(date: string): Promise<any | null> {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
     },
   })
-
   const text = await resp.text()
   const match = text.match(/callbackdata\d+\((.+)\)/)
   if (!match) throw new Error('解析东方财富回调数据失败')
-
   const json = JSON.parse(match[1]!)
   return json?.data ?? null
 }
